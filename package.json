@@ -1,0 +1,22 @@
+{
+  "name": "fixitnow",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "FixItNow: AI-Enabled Civic Grievance Platform",
+  "scripts": {
+    "server": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "admin": "npm --prefix admin-web run dev",
+    "ai": "python -m uvicorn app.main:app --app-dir ai-service --port 8000 --reload",
+    "test:server": "npm --prefix server test"
+  },
+  "keywords": [
+    "civic-tech",
+    "grievance-redressal",
+    "municipal-corporation",
+    "ai-triage",
+    "pincode-routing"
+  ]
+}
