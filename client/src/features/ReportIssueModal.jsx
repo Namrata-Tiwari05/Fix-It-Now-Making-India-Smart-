@@ -13,9 +13,10 @@ export const ReportIssueModal = ({ isOpen, onClose, onSuccess, onSelectComplaint
   const userProfile = api.getUser();
 
   // Location Form State (PIN Code, State, District, Street Address, Landmark, Lat, Lng)
-  const [pincode, setPincode] = useState(() => userProfile?.pincode || '');
-  const [stateName, setStateName] = useState(() => userProfile?.state || '');
-  const [district, setDistrict] = useState(() => userProfile?.district || '');
+  // Fields are empty by default; auto-filled only on 'My Current Location'
+  const [pincode, setPincode] = useState('');
+  const [stateName, setStateName] = useState('');
+  const [district, setDistrict] = useState('');
   const [streetAddress, setStreetAddress] = useState('');
   const [landmark, setLandmark] = useState('');
   const [lat, setLat] = useState(null);
@@ -51,6 +52,26 @@ export const ReportIssueModal = ({ isOpen, onClose, onSuccess, onSelectComplaint
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdComplaint, setCreatedComplaint] = useState(null);
 
+  const resetForm = () => {
+    setStep(1);
+    setDescription('');
+    setPincode('');
+    setStateName('');
+    setDistrict('');
+    setStreetAddress('');
+    setLandmark('');
+    setLat(null);
+    setLng(null);
+    setSelectedPhoto(null);
+    setSelectedCategory('');
+    setSelectedPriority('MEDIUM');
+    setAiResult(null);
+    setCreatedComplaint(null);
+    setLocationError(null);
+    setPinInfo(null);
+    stopCameraStream();
+  };
+
   // Cleanup camera stream and speech recognition on unmount or close
   useEffect(() => {
     return () => {
@@ -61,10 +82,10 @@ export const ReportIssueModal = ({ isOpen, onClose, onSuccess, onSelectComplaint
     };
   }, []);
 
-  // When modal closes or reopens, reset camera stream
+  // When modal closes or reopens, reset form state and camera stream
   useEffect(() => {
     if (!isOpen) {
-      stopCameraStream();
+      resetForm();
       if (isListeningVoice) {
         stopVoiceRecognition();
       }
@@ -306,7 +327,7 @@ export const ReportIssueModal = ({ isOpen, onClose, onSuccess, onSelectComplaint
             if (data.state) setStateName(data.state);
             if (data.district) setDistrict(data.district);
             if (data.address) setStreetAddress(data.address);
-            if (data.landmark) setLandmark(data.landmark);
+            // Landmark remains manually editable and is not auto-filled
           } else {
             setLocationError('Coordinates retrieved, but reverse geocoding was unable to pinpoint postal details. Please fill in your address fields manually.');
           }
@@ -399,7 +420,8 @@ export const ReportIssueModal = ({ isOpen, onClose, onSuccess, onSelectComplaint
         lng: lng || 83.3732,
         category: selectedCategory || 'Roads & Potholes',
         priority: selectedPriority || 'MEDIUM',
-        media: selectedPhoto ? [selectedPhoto] : []
+        media: selectedPhoto ? [selectedPhoto] : [],
+        citizen_phone: userProfile?.phone || ''
       };
 
       const res = await api.createComplaint(payload);
@@ -950,6 +972,30 @@ export const ReportIssueModal = ({ isOpen, onClose, onSuccess, onSelectComplaint
                     </>
                   )}
                 </button>
+
+                {/* Display exact coordinates when detected */}
+                {lat !== null && lng !== null && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      marginTop: '0.6rem',
+                      padding: '0.6rem 0.85rem',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(212, 255, 0, 0.08)',
+                      border: '1px solid rgba(212, 255, 0, 0.25)',
+                      color: 'var(--accent-lime, #D4FF00)',
+                      fontSize: '0.78rem',
+                      fontWeight: 600
+                    }}
+                  >
+                    <MapPin size={15} style={{ flexShrink: 0 }} />
+                    <span>
+                      Detected Coordinates: <strong>{Number(lat).toFixed(6)}° N, {Number(lng).toFixed(6)}° E</strong>
+                    </span>
+                  </div>
+                )}
 
                 {locationError && (
                   <div

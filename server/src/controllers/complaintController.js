@@ -7,6 +7,7 @@ import { pincodeRoutingService } from '../services/routing/pincodeRouting.js';
 import { aiOrchestrator } from '../services/ai/aiOrchestrator.js';
 import { slaService } from '../services/sla/slaService.js';
 import { successResponse, errorResponse } from '../utils/response.js';
+import { normalizePhone } from '../utils/phone.js';
 
 export const complaintController = {
   /**
@@ -66,10 +67,12 @@ export const complaintController = {
       const finalPriority = priority || aiResult.priority || 'MEDIUM';
       const dueDate = slaService.calculateDueDate(finalPriority);
 
+      const userPhone = normalizePhone(req.user.phone || req.body.citizen_phone);
+
       const complaintData = {
         citizen_id: req.user.id,
         citizen_name: req.user.name,
-        citizen_phone: req.user.phone || req.body.citizen_phone,
+        citizen_phone: userPhone,
         municipality_id: routing.municipality_id,
         municipality_name: routing.municipality_name,
         pincode: routing.pincode || pincode,
@@ -216,7 +219,11 @@ export const complaintController = {
    */
   async getMyReports(req, res, next) {
     try {
-      const list = db.listComplaints({ citizen_id: req.user.id });
+      const userPhone = normalizePhone(req.user.phone);
+      const list = db.listComplaints({
+        citizen_id: req.user.id,
+        citizen_phone: userPhone
+      });
       const enriched = list.map(c => ({
         ...c,
         sla_metrics: slaService.getSlaMetrics(c)

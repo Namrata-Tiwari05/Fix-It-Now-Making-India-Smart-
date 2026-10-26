@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Building2, Phone, Mail, Clock, MapPin, Save, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Settings, Building2, Phone, Mail, Clock, MapPin, Save, CheckCircle2, AlertCircle, RefreshCw, Plus, X } from 'lucide-react';
 import { adminApi } from '../../services/api.js';
 
 export const MunicipalSettingsView = () => {
@@ -16,6 +16,12 @@ export const MunicipalSettingsView = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null); // { type: 'success' | 'error', text: '' }
+
+  // PIN code management state
+  const [newPin, setNewPin] = useState('');
+  const [newLocality, setNewLocality] = useState('');
+  const [isAddingPin, setIsAddingPin] = useState(false);
+  const [pinActionError, setPinActionError] = useState(null);
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -46,6 +52,59 @@ export const MunicipalSettingsView = () => {
     fetchSettings();
   }, []);
 
+  const handleAddPin = async (e) => {
+    if (e) e.preventDefault();
+    const clean = newPin.replace(/\D/g, '').slice(0, 6);
+    if (clean.length !== 6) {
+      setPinActionError('Please enter a valid 6-digit PIN code.');
+      return;
+    }
+    if (settings.pincodes.includes(clean)) {
+      setPinActionError(`PIN code ${clean} is already covered by this municipality.`);
+      return;
+    }
+
+    setIsAddingPin(true);
+    setPinActionError(null);
+    try {
+      const res = await adminApi.addMunicipalPincode(clean, newLocality.trim());
+      if (res.success) {
+        setSettings(prev => ({
+          ...prev,
+          pincodes: [...prev.pincodes, clean]
+        }));
+        setNewPin('');
+        setNewLocality('');
+        setStatusMessage({ type: 'success', text: `PIN code ${clean} successfully added and persisted to municipality jurisdiction.` });
+      } else {
+        setPinActionError(res.message || 'Failed to add PIN code.');
+      }
+    } catch (err) {
+      setPinActionError('Network error while adding PIN code.');
+    } finally {
+      setIsAddingPin(false);
+    }
+  };
+
+  const handleRemovePin = async (pinToRemove) => {
+    if (!window.confirm(`Are you sure you want to unmap PIN code ${pinToRemove} from this municipality?`)) return;
+
+    try {
+      const res = await adminApi.removeMunicipalPincode(pinToRemove);
+      if (res.success) {
+        setSettings(prev => ({
+          ...prev,
+          pincodes: prev.pincodes.filter(p => p !== pinToRemove)
+        }));
+        setStatusMessage({ type: 'success', text: `PIN code ${pinToRemove} unmapped successfully.` });
+      } else {
+        alert(res.message || 'Failed to remove PIN code.');
+      }
+    } catch (err) {
+      alert('Error removing PIN code.');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -55,7 +114,8 @@ export const MunicipalSettingsView = () => {
         contact_email: settings.contact_email,
         contact_phone: settings.contact_phone,
         emergency_helpline: settings.emergency_helpline,
-        default_sla_hours: parseInt(settings.default_sla_hours, 10) || 48
+        default_sla_hours: parseInt(settings.default_sla_hours, 10) || 48,
+        pincodes: settings.pincodes
       };
       const res = await adminApi.updateMunicipalSettings(payload);
       if (res.success) {
@@ -345,29 +405,115 @@ export const MunicipalSettingsView = () => {
             </div>
           </div>
 
-          {/* Jurisdictional Coverage PINs (Read-only list) */}
+          {/* Jurisdictional Coverage PINs (Interactive Add & Manage) */}
           <div style={{
             backgroundColor: '#18202A',
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: '16px',
             padding: '1.5rem'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#F8FAFC', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <MapPin size={18} color="#D4FF00" />
-                Active Covered PIN Codes ({settings.pincodes.length})
-              </h3>
-              <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                Citizen complaints in these postal codes route here
-              </span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#F8FAFC', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                  <MapPin size={18} color="#D4FF00" />
+                  Active Covered PIN Codes ({settings.pincodes.length})
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', marginTop: '0.2rem' }}>
+                  Citizen complaints reported in these postal codes automatically route to your corporation queue
+                </span>
+              </div>
             </div>
 
+            {/* Quick Add PIN Form */}
+            <div style={{
+              backgroundColor: '#12181F',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: '12px',
+              padding: '1rem',
+              marginBottom: '1.25rem'
+            }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#F8FAFC', marginBottom: '0.6rem' }}>
+                Add New Covered PIN Code
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={newPin}
+                  onChange={(e) => {
+                    setNewPin(e.target.value.replace(/\D/g, ''));
+                    setPinActionError(null);
+                  }}
+                  placeholder="6-digit PIN (e.g. 273010)"
+                  style={{
+                    width: '180px',
+                    backgroundColor: '#18202A',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '8px',
+                    padding: '0.55rem 0.8rem',
+                    fontSize: '0.88rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    color: '#D4FF00',
+                    outline: 'none'
+                  }}
+                />
+                <input
+                  type="text"
+                  value={newLocality}
+                  onChange={(e) => setNewLocality(e.target.value)}
+                  placeholder="Locality / Zone (optional)"
+                  style={{
+                    flex: '1',
+                    minWidth: '200px',
+                    backgroundColor: '#18202A',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '8px',
+                    padding: '0.55rem 0.8rem',
+                    fontSize: '0.82rem',
+                    color: '#F8FAFC',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddPin}
+                  disabled={isAddingPin || newPin.length !== 6}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    backgroundColor: newPin.length === 6 ? '#D4FF00' : 'rgba(212, 255, 0, 0.2)',
+                    color: newPin.length === 6 ? '#0B0F12' : '#64748B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.55rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: newPin.length === 6 && !isAddingPin ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {isAddingPin ? <RefreshCw size={14} className="animate-spin" /> : <Plus size={15} />}
+                  <span>Add PIN Code</span>
+                </button>
+              </div>
+
+              {pinActionError && (
+                <div style={{ marginTop: '0.5rem', color: '#EF4444', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <AlertCircle size={13} />
+                  <span>{pinActionError}</span>
+                </div>
+              )}
+            </div>
+
+            {/* List of Covered PINs with Remove Option */}
             {settings.pincodes.length === 0 ? (
-              <div style={{ padding: '1.25rem', backgroundColor: '#12181F', borderRadius: '10px', color: '#94A3B8', fontSize: '0.8rem' }}>
-                No postal codes mapped yet. Ask Master Admin to allocate PIN codes to this municipality.
+              <div style={{ padding: '1.25rem', backgroundColor: '#12181F', borderRadius: '10px', color: '#94A3B8', fontSize: '0.8rem', textAlign: 'center' }}>
+                No postal codes mapped yet. Add a PIN code above to route complaints here.
               </div>
             ) : (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
                 {settings.pincodes.map((pin, idx) => (
                   <span
                     key={idx}
@@ -376,13 +522,37 @@ export const MunicipalSettingsView = () => {
                       border: '1px solid rgba(212, 255, 0, 0.25)',
                       color: '#D4FF00',
                       borderRadius: '8px',
-                      padding: '0.35rem 0.75rem',
-                      fontSize: '0.82rem',
+                      padding: '0.4rem 0.65rem 0.4rem 0.8rem',
+                      fontSize: '0.84rem',
                       fontWeight: 700,
-                      letterSpacing: '0.04em'
+                      letterSpacing: '0.04em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
                     }}
                   >
-                    📍 {pin}
+                    <span>📍 {pin}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePin(pin)}
+                      title={`Remove PIN ${pin}`}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'rgba(212, 255, 0, 0.6)',
+                        cursor: 'pointer',
+                        padding: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '4px',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = '#EF4444'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(212, 255, 0, 0.6)'; }}
+                    >
+                      <X size={13} />
+                    </button>
                   </span>
                 ))}
               </div>

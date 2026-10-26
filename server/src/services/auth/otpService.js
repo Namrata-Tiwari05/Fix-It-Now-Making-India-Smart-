@@ -1,22 +1,17 @@
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/index.js';
+import { normalizePhone, isSamePhone } from '../../utils/phone.js';
 
 // In-memory OTP storage with TTL for development / staging
-// Production can seamlessly integrate MSG91, Twilio, or Supabase Phone Auth
 class OtpService {
   constructor() {
     this.otpCache = new Map();
   }
 
-  // Normalize phone number to uniform format (+91...)
+  // Canonical Indian phone number normalization: +91XXXXXXXXXX
   normalizePhone(rawPhone) {
-    if (!rawPhone) return '';
-    const digits = String(rawPhone).replace(/[^\d+]/g, '');
-    if (digits.startsWith('+91')) return digits;
-    if (digits.startsWith('91') && digits.length === 12) return `+${digits}`;
-    if (digits.length === 10) return `+91${digits}`;
-    return digits;
+    return normalizePhone(rawPhone);
   }
 
   // Mask Aadhaar: e.g. "1234 5678 9012" -> "XXXX-XXXX-9012"
@@ -37,7 +32,7 @@ class OtpService {
 
   // Generate random 4-digit OTP
   generateOtp(phone) {
-    const normalized = this.normalizePhone(phone);
+    const normalized = normalizePhone(phone);
     if (!normalized || normalized.length < 10) {
       throw new Error('Valid mobile phone number is required.');
     }
@@ -81,8 +76,8 @@ class OtpService {
   }
 
   // Verify submitted OTP
-  verifyOtp(phone, inputOtp) {
-    const normalized = this.normalizePhone(phone);
+  async verifyOtp(phone, inputOtp) {
+    const normalized = normalizePhone(phone);
     const record = this.otpCache.get(normalized);
 
     if (!record) {
@@ -120,43 +115,53 @@ class OtpService {
     // OTP verified successfully -> clear cache
     this.otpCache.delete(normalized);
 
-    // Check if citizen profile exists in database and has completed their profile
-    const existingProfile = db.getProfileByPhone(normalized);
-    const isCompleted = Boolean(
-      existingProfile &&
-      existingProfile.is_profile_completed &&
-      existingProfile.name &&
-      existingProfile.name !== 'Unregistered Citizen' &&
-      existingProfile.state &&
-      existingProfile.district &&
-      existingProfile.pincode
-    );
+    // Look up existing citizen profile in database
+    let existingProfile = db.getProfileByPhone(normalized);
 
-    if (isCompleted) {
+    if (existingProfile) {
+      const isCompleted = Boolean(
+        existingProfile.is_profile_completed &&
+        existingProfile.name &&
+        existingProfile.name !== 'Unregistered Citizen' &&
+        existingProfile.name !== 'Citizen' &&
+        existingProfile.state &&
+        existingProfile.district &&
+        existingProfile.pincode
+      );
+
+      const token = `cit_${Buffer.from(`${existingProfile.id}:${Date.now()}`).toString('base64')}`;
+
       return {
         verified: true,
-        isFirstTime: false,
-        isProfileCompleted: true,
+        isFirstTime: !isCompleted,
+        isProfileCompleted: isCompleted,
         profile: existingProfile,
-        token: `cit_${Buffer.from(`${existingProfile.id}:${Date.now()}`).toString('base64')}`
+        token
       };
     }
 
-    // New citizen or incomplete profile -> needs Create Profile
-    const profileId = existingProfile?.id || uuidv4();
+    // New citizen: immediately create persistent citizen profile so ID is permanent and never orphaned
+    existingProfile = await db.createOrUpdateCitizenProfile({
+      phone: normalized,
+      name: 'Citizen',
+      is_profile_completed: false
+    });
+
+    const token = `cit_${Buffer.from(`${existingProfile.id}:${Date.now()}`).toString('base64')}`;
+
     return {
       verified: true,
       isFirstTime: true,
       isProfileCompleted: false,
       phone: normalized,
-      profile: existingProfile || null,
-      token: `cit_${Buffer.from(`${profileId}:${Date.now()}`).toString('base64')}`
+      profile: existingProfile,
+      token
     };
   }
 
   // Complete citizen profile onboarding
   async completeOnboarding({ phone, name, avatarUrl, state, district, pincode, aadhaar }) {
-    const normalized = this.normalizePhone(phone);
+    const normalized = normalizePhone(phone);
     if (!name || name.trim().length < 2) {
       const err = new Error('Full Name is required (minimum 2 characters).');
       err.statusCode = 400;
@@ -188,7 +193,7 @@ class OtpService {
     const aadhaarMasked = aadhaar ? this.maskAadhaar(aadhaar) : null;
     const aadhaarHash = aadhaar ? this.hashAadhaar(aadhaar) : null;
 
-    // Create or update real profile in database
+    // Create or update real profile in database and persist
     const profile = await db.createOrUpdateCitizenProfile({
       phone: normalized,
       name: name.trim(),

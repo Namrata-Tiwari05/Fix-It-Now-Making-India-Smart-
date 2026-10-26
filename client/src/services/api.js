@@ -39,21 +39,32 @@ export const api = {
     return headers;
   },
 
+  normalizePhone(rawPhone) {
+    if (!rawPhone) return '';
+    const digits = String(rawPhone).replace(/\D/g, '');
+    if (digits.length >= 10) {
+      return `+91${digits.slice(-10)}`;
+    }
+    return digits ? `+91${digits}` : '';
+  },
+
   // --- Citizen Phone OTP Authentication ---
   async sendCitizenOtp(phone) {
+    const cleanPhone = this.normalizePhone(phone);
     const res = await fetch(`${API_BASE}/auth/citizen/send-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone })
+      body: JSON.stringify({ phone: cleanPhone })
     });
     return res.json();
   },
 
   async verifyCitizenOtp(phone, otp) {
+    const cleanPhone = this.normalizePhone(phone);
     const res = await fetch(`${API_BASE}/auth/citizen/verify-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, otp })
+      body: JSON.stringify({ phone: cleanPhone, otp })
     });
     return res.json();
   },
@@ -77,11 +88,12 @@ export const api = {
     const token = this.getToken();
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
+    const cleanPhone = this.normalizePhone(phone);
 
     const res = await fetch(`${API_BASE}/auth/citizen/onboard`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ phone, name, avatarUrl, state, district, pincode })
+      body: JSON.stringify({ phone: cleanPhone, name, avatarUrl, state, district, pincode })
     });
     return res.json();
   },
@@ -90,6 +102,9 @@ export const api = {
     const res = await fetch(`${API_BASE}/auth/me`, {
       headers: this.getHeaders()
     });
+    if (res.status === 401) {
+      this.clearSession();
+    }
     return res.json();
   },
 

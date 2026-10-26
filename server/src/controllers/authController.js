@@ -34,7 +34,7 @@ export const authController = {
         return errorResponse(res, 'Phone number and OTP code are required.', 'MISSING_FIELDS', 400);
       }
 
-      const result = otpService.verifyOtp(phone, otp);
+      const result = await otpService.verifyOtp(phone, otp);
       return successResponse(res, result, 'OTP verified successfully.');
     } catch (err) {
       next(err);
@@ -212,13 +212,14 @@ export const authController = {
         return errorResponse(res, 'Unauthenticated', 'UNAUTHORIZED', 401);
       }
 
+      const fullProfile = db.getProfileById(req.user.id) || req.user;
       let municipality = null;
-      if (req.user.municipality_id) {
-        municipality = db.municipalities.find(m => m.id === req.user.municipality_id) || null;
+      if (fullProfile.municipality_id) {
+        municipality = db.municipalities.find(m => m.id === fullProfile.municipality_id) || null;
       }
 
       return successResponse(res, {
-        ...req.user,
+        ...fullProfile,
         municipality_name: municipality?.name || null,
         municipality_code: municipality?.code || null
       });

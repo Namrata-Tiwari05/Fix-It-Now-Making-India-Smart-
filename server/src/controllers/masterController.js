@@ -134,6 +134,8 @@ export const masterController = {
         reason: 'Master Government Admin created Municipal Corporation'
       });
 
+      db.persist();
+
       return successResponse(res, {
         municipality: newMuni,
         admin: createdAdmin
@@ -271,6 +273,8 @@ export const masterController = {
         new_value: { count: added.length, pincodes: added.map(a => a.pincode) },
         reason: 'Master Admin configured PIN code coverage'
       });
+
+      db.persist();
 
       return successResponse(res, added, `Configured ${added.length} PIN codes`);
     } catch (err) {

@@ -1,9 +1,18 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { supabaseAdminClient } from '../../config/supabase.js';
+import { normalizePhone, isSamePhone } from '../../utils/phone.js';
 
-// Comprehensive Supabase-backed civic database store
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const STORAGE_FILE = path.resolve(__dirname, '../../../data/store.json');
+
+// Comprehensive Persistent Civic Database Store with Local File Persistence and Supabase Sync
 class DatabaseStore {
   constructor() {
+    this.storageFilePath = STORAGE_FILE;
     this.municipalities = [];
     this.municipality_pincodes = [];
     this.wards = [];
@@ -23,83 +32,183 @@ class DatabaseStore {
   }
 
   /**
-   * Load real data from Supabase tables on startup
+   * Serialize store data to JSON object
+   */
+  toJSON() {
+    return {
+      counter: this.counter,
+      municipalities: this.municipalities,
+      municipality_pincodes: this.municipality_pincodes,
+      wards: this.wards,
+      departments: this.departments,
+      officers: this.officers,
+      profiles: this.profiles,
+      complaints: this.complaints,
+      complaint_media: this.complaint_media,
+      ai_analyses: this.ai_analyses,
+      complaint_duplicates: this.complaint_duplicates,
+      assignments: this.assignments,
+      resolutions: this.resolutions,
+      audit_logs: this.audit_logs,
+      notifications: this.notifications
+    };
+  }
+
+  /**
+   * Populate state from JSON data
+   */
+  loadFromJSON(data) {
+    if (!data) return;
+    this.counter = data.counter || 0;
+    this.municipalities = data.municipalities || [];
+    this.municipality_pincodes = data.municipality_pincodes || [];
+    this.wards = data.wards || [];
+    this.departments = data.departments || [];
+    this.officers = data.officers || [];
+    this.profiles = data.profiles || [];
+
+    // Filter out dummy seed complaints so dashboard only contains real user reports
+    const dummyIds = new Set(['c1111111-1111-1111-1111-111111111111', 'c2222222-2222-2222-2222-222222222222']);
+    this.complaints = (data.complaints || []).filter(c => !dummyIds.has(c.id));
+    this.complaint_media = (data.complaint_media || []).filter(m => !dummyIds.has(m.complaint_id));
+    this.ai_analyses = (data.ai_analyses || []).filter(a => !dummyIds.has(a.complaint_id));
+    this.complaint_duplicates = data.complaint_duplicates || [];
+    this.assignments = (data.assignments || []).filter(asg => !dummyIds.has(asg.complaint_id));
+    this.resolutions = data.resolutions || [];
+    this.audit_logs = data.audit_logs || [];
+    this.notifications = data.notifications || [];
+
+    // Link media to complaints in memory
+    for (const comp of this.complaints) {
+      comp.media = this.complaint_media.filter(m => m.complaint_id === comp.id);
+    }
+  }
+
+  /**
+   * Safe persistent file write to disk
+   */
+  persist() {
+    try {
+      const dataDir = path.dirname(this.storageFilePath);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      fs.writeFileSync(this.storageFilePath, JSON.stringify(this.toJSON(), null, 2), 'utf-8');
+    } catch (err) {
+      console.error('[DatabaseStore] Persistence error writing to disk:', err.message);
+    }
+  }
+
+  /**
+   * Load real data from local persistent store and attempt Supabase sync with timeout
    */
   async init() {
-    if (!supabaseAdminClient) {
-      console.warn('[DatabaseStore] Supabase admin client not configured. Running in memory.');
-      return;
+    const dataDir = path.dirname(this.storageFilePath);
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    try {
-      console.log('[DatabaseStore] Synchronizing state with Supabase PostgreSQL...');
-
-      const [
-        { data: munis },
-        { data: pins },
-        { data: wards },
-        { data: depts },
-        { data: officers },
-        { data: profs },
-        { data: comps },
-        { data: media },
-        { data: ai },
-        { data: dups },
-        { data: assigns },
-        { data: resols },
-        { data: logs },
-        { data: notifs }
-      ] = await Promise.all([
-        supabaseAdminClient.from('municipalities').select('*'),
-        supabaseAdminClient.from('municipality_pincodes').select('*'),
-        supabaseAdminClient.from('wards').select('*'),
-        supabaseAdminClient.from('departments').select('*'),
-        supabaseAdminClient.from('officers').select('*'),
-        supabaseAdminClient.from('profiles').select('*'),
-        supabaseAdminClient.from('complaints').select('*').order('created_at', { ascending: false }),
-        supabaseAdminClient.from('complaint_media').select('*'),
-        supabaseAdminClient.from('ai_analyses').select('*'),
-        supabaseAdminClient.from('complaint_duplicates').select('*'),
-        supabaseAdminClient.from('assignments').select('*'),
-        supabaseAdminClient.from('resolutions').select('*'),
-        supabaseAdminClient.from('audit_logs').select('*').order('timestamp', { ascending: false }),
-        supabaseAdminClient.from('notifications').select('*').order('created_at', { ascending: false })
-      ]);
-
-      this.municipalities = munis || [];
-      this.municipality_pincodes = pins || [];
-      this.wards = wards || [];
-      this.departments = depts || [];
-      this.officers = officers || [];
-      this.profiles = profs || [];
-      this.complaints = comps || [];
-      this.complaint_media = media || [];
-      this.ai_analyses = ai || [];
-      this.complaint_duplicates = dups || [];
-      this.assignments = assigns || [];
-      this.resolutions = resols || [];
-      this.audit_logs = logs || [];
-      this.notifications = notifs || [];
-
-      // Link media to complaints in memory
-      for (const comp of this.complaints) {
-        comp.media = this.complaint_media.filter(m => m.complaint_id === comp.id);
-      }
-
-      if (this.municipalities.length === 0) {
-        this.seedInitialData();
-      }
-
-      this.counter = this.complaints.length;
-      this.initialized = true;
-
-      console.log(`[DatabaseStore] Synced: ${this.municipalities.length} Municipalities, ${this.municipality_pincodes.length} PINs, ${this.complaints.length} Complaints, ${this.profiles.length} Profiles.`);
-    } catch (err) {
-      console.error('[DatabaseStore] Initialization error from Supabase:', err.message);
-      if (this.municipalities.length === 0) {
-        this.seedInitialData();
+    let hasLocalData = false;
+    if (fs.existsSync(this.storageFilePath)) {
+      try {
+        const raw = fs.readFileSync(this.storageFilePath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.municipalities) && parsed.municipalities.length > 0) {
+          this.loadFromJSON(parsed);
+          hasLocalData = true;
+          this.persist();
+          console.log(`[DatabaseStore] Loaded local persistent store: ${this.profiles.length} Profiles, ${this.complaints.length} Complaints.`);
+        }
+      } catch (e) {
+        console.warn('[DatabaseStore] Failed reading local store:', e.message);
       }
     }
+
+    if (!hasLocalData) {
+      this.seedInitialData();
+      this.persist();
+    }
+
+    // Optional remote Supabase sync with a strict 3-second timeout
+    if (supabaseAdminClient) {
+      try {
+        const syncPromise = (async () => {
+          const [
+            { data: munis },
+            { data: pins },
+            { data: wards },
+            { data: depts },
+            { data: officers },
+            { data: profs },
+            { data: comps },
+            { data: media },
+            { data: ai },
+            { data: dups },
+            { data: assigns },
+            { data: resols },
+            { data: logs },
+            { data: notifs }
+          ] = await Promise.all([
+            supabaseAdminClient.from('municipalities').select('*'),
+            supabaseAdminClient.from('municipality_pincodes').select('*'),
+            supabaseAdminClient.from('wards').select('*'),
+            supabaseAdminClient.from('departments').select('*'),
+            supabaseAdminClient.from('officers').select('*'),
+            supabaseAdminClient.from('profiles').select('*'),
+            supabaseAdminClient.from('complaints').select('*').order('created_at', { ascending: false }),
+            supabaseAdminClient.from('complaint_media').select('*'),
+            supabaseAdminClient.from('ai_analyses').select('*'),
+            supabaseAdminClient.from('complaint_duplicates').select('*'),
+            supabaseAdminClient.from('assignments').select('*'),
+            supabaseAdminClient.from('resolutions').select('*'),
+            supabaseAdminClient.from('audit_logs').select('*').order('timestamp', { ascending: false }),
+            supabaseAdminClient.from('notifications').select('*').order('created_at', { ascending: false })
+          ]);
+
+          if (munis && munis.length > 0) {
+            this.municipalities = munis;
+            if (pins?.length) {
+              const pinMap = new Map(this.municipality_pincodes.map(p => [p.pincode, p]));
+              for (const p of pins) {
+                if (!pinMap.has(p.pincode)) {
+                  pinMap.set(p.pincode, p);
+                }
+              }
+              this.municipality_pincodes = Array.from(pinMap.values());
+            }
+            if (wards?.length) this.wards = wards;
+            if (depts?.length) this.departments = depts;
+            if (officers?.length) this.officers = officers;
+            if (profs?.length) this.profiles = profs;
+            if (comps?.length) this.complaints = comps;
+            if (media?.length) this.complaint_media = media;
+            if (ai?.length) this.ai_analyses = ai;
+            if (dups?.length) this.complaint_duplicates = dups;
+            if (assigns?.length) this.assignments = assigns;
+            if (resols?.length) this.resolutions = resols;
+            if (logs?.length) this.audit_logs = logs;
+            if (notifs?.length) this.notifications = notifs;
+
+            for (const comp of this.complaints) {
+              comp.media = this.complaint_media.filter(m => m.complaint_id === comp.id);
+            }
+            this.counter = this.complaints.length;
+            this.persist();
+            console.log(`[DatabaseStore] Synced state with Supabase PostgreSQL: ${this.complaints.length} Complaints.`);
+          }
+        })();
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Supabase sync timeout after 3000ms')), 3000)
+        );
+
+        await Promise.race([syncPromise, timeoutPromise]);
+      } catch (err) {
+        console.warn('[DatabaseStore] Supabase remote sync skipped (using robust local persistent store):', err.message);
+      }
+    }
+
+    this.initialized = true;
   }
 
   seedInitialData() {
@@ -169,14 +278,16 @@ class DatabaseStore {
     const swmDeptId = 'd3333333-3333-3333-3333-333333333333';
 
     this.departments = [
-      { id: roadsDeptId, municipality_id: gmcId, name: 'Roads & Infrastructure', code: 'ROADS-01', category_mappings: ['Roads & Footpaths', 'Street Lighting'], sla_hours_default: 48 },
-      { id: waterDeptId, municipality_id: gmcId, name: 'Water Supply & Drainage', code: 'WATER-01', category_mappings: ['Drainage & Sewerage', 'Water Supply'], sla_hours_default: 24 },
-      { id: swmDeptId, municipality_id: gmcId, name: 'Solid Waste Management', code: 'SWM-01', category_mappings: ['Garbage & Sanitation'], sla_hours_default: 12 }
+      { id: roadsDeptId, municipality_id: gmcId, name: 'Roads & Infrastructure', code: 'ROADS-01', category_mappings: ['Roads & Footpaths', 'Street Lighting', 'Roads & Potholes'], sla_hours_default: 48 },
+      { id: waterDeptId, municipality_id: gmcId, name: 'Water Supply & Drainage', code: 'WATER-01', category_mappings: ['Drainage & Sewerage', 'Water Supply', 'Water & Sewage'], sla_hours_default: 24 },
+      { id: swmDeptId, municipality_id: gmcId, name: 'Solid Waste Management', code: 'SWM-01', category_mappings: ['Garbage & Sanitation', 'Garbage Dump'], sla_hours_default: 12 }
     ];
 
     const masterAdminId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
     const municipalAdminId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
     const officerProfileId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+    const citizen1Id = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
+    const citizen2Id = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
 
     this.profiles = [
       {
@@ -190,7 +301,9 @@ class DatabaseStore {
         pincode: '226001',
         is_profile_completed: true,
         municipality_id: null,
-        is_active: true
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       },
       {
         id: municipalAdminId,
@@ -203,7 +316,9 @@ class DatabaseStore {
         pincode: '273001',
         is_profile_completed: true,
         municipality_id: gmcId,
-        is_active: true
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       },
       {
         id: officerProfileId,
@@ -216,7 +331,41 @@ class DatabaseStore {
         pincode: '273001',
         is_profile_completed: true,
         municipality_id: gmcId,
-        is_active: true
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: citizen1Id,
+        email: 'rajesh.kumar@fixitnow.in',
+        role: 'citizen',
+        name: 'Rajesh Kumar',
+        phone: '+919876543210',
+        avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+        state: 'Uttar Pradesh',
+        district: 'Gorakhpur',
+        pincode: '273001',
+        is_profile_completed: true,
+        municipality_id: null,
+        is_active: true,
+        created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
+        updated_at: new Date(Date.now() - 10 * 86400000).toISOString()
+      },
+      {
+        id: citizen2Id,
+        email: 'anita.sharma@fixitnow.in',
+        role: 'citizen',
+        name: 'Anita Sharma',
+        phone: '+919876543211',
+        avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+        state: 'Uttar Pradesh',
+        district: 'Gorakhpur',
+        pincode: '273002',
+        is_profile_completed: true,
+        municipality_id: null,
+        is_active: true,
+        created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
+        updated_at: new Date(Date.now() - 5 * 86400000).toISOString()
       }
     ];
 
@@ -231,94 +380,17 @@ class DatabaseStore {
         department_name: 'Roads & Infrastructure',
         phone: '+919811000003',
         status: 'active',
-        active_workload: 1
+        active_workload: 1,
+        created_at: new Date().toISOString()
       }
     ];
 
-    this.complaints = [
-      {
-        id: 'c1111111-1111-1111-1111-111111111111',
-        complaint_number: 'FIX-2026-0001',
-        citizen_id: null,
-        citizen_name: 'Rajesh Kumar',
-        citizen_phone: '+919876543210',
-        municipality_id: gmcId,
-        municipality_name: 'Gorakhpur Municipal Corporation',
-        pincode: '273001',
-        ward_id: ward1Id,
-        ward_name: 'Ward 12 - Golghar Central',
-        department_id: roadsDeptId,
-        department_name: 'Roads & Infrastructure',
-        assigned_officer_id: officerId,
-        assigned_officer_name: 'Inspector Suresh Yadav',
-        address: 'Golghar Main Market, near City Mall',
-        landmark: 'Opposite City Mall',
-        category: 'Roads & Footpaths',
-        category_confirmed_by_admin: true,
-        priority: 'HIGH',
-        priority_reason: 'Major commercial market thoroughfare with deep pothole hazard.',
-        status: 'IN_PROGRESS',
-        description: 'Large crater near Golghar crossing causing heavy traffic congestion and motorcycle skid accidents.',
-        is_routing_review: false,
-        ai_status: 'COMPLETED',
-        due_at: new Date(Date.now() + 36 * 3600000).toISOString(),
-        sla_breached: false,
-        reopen_count: 0,
-        citizen_rating: null,
-        citizen_feedback: null,
-        citizen_confirmed: false,
-        media: [
-          {
-            id: 'm-photo-1',
-            complaint_id: 'c1111111-1111-1111-1111-111111111111',
-            type: 'image',
-            storage_path: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600',
-            caption: 'Pothole on Golghar Main Rd'
-          }
-        ],
-        created_at: new Date(Date.now() - 6 * 3600000).toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: 'c2222222-2222-2222-2222-222222222222',
-        complaint_number: 'FIX-2026-0002',
-        citizen_id: null,
-        citizen_name: 'Anita Sharma',
-        citizen_phone: '+919876543211',
-        municipality_id: gmcId,
-        municipality_name: 'Gorakhpur Municipal Corporation',
-        pincode: '273002',
-        ward_id: ward2Id,
-        ward_name: 'Ward 15 - Civil Lines',
-        department_id: waterDeptId,
-        department_name: 'Water Supply & Drainage',
-        assigned_officer_id: null,
-        assigned_officer_name: null,
-        address: 'Park Road, Civil Lines',
-        landmark: 'Near Head Post Office',
-        category: 'Drainage & Sewerage',
-        category_confirmed_by_admin: false,
-        priority: 'CRITICAL',
-        priority_reason: 'Overflowing storm drain blocking access road and posing health hazard.',
-        status: 'SUBMITTED',
-        description: 'Severe sewage line blockage causing contaminated water to overflow onto Park Road.',
-        is_routing_review: false,
-        ai_status: 'COMPLETED',
-        due_at: new Date(Date.now() + 20 * 3600000).toISOString(),
-        sla_breached: false,
-        reopen_count: 0,
-        citizen_rating: null,
-        citizen_feedback: null,
-        citizen_confirmed: false,
-        media: [],
-        created_at: new Date(Date.now() - 2 * 3600000).toISOString(),
-        updated_at: new Date().toISOString()
-      }
-    ];
-
-    this.counter = this.complaints.length;
+    // Real system complaints only: start empty until user reports are submitted
+    this.complaints = [];
+    this.complaint_media = [];
+    this.counter = 0;
     this.initialized = true;
-    console.log('[DatabaseStore] Seed dataset ready: Gorakhpur, PINs, Staff, Officers & Complaints initialized.');
+    console.log('[DatabaseStore] Seed dataset ready: Gorakhpur, PINs, Staff & Officers initialized (zero dummy complaints).');
   }
 
   // --- Authoritative Jurisdiction & PIN Methods ---
@@ -356,12 +428,29 @@ class DatabaseStore {
   async createComplaint(data) {
     const complaintId = uuidv4();
     const complaintNumber = this.generateComplaintNumber();
+    const canonicalPhone = normalizePhone(data.citizen_phone);
 
-    // Verify if citizen_id actually exists in profiles to satisfy FK constraint
+    // Verify or find citizen_id in profiles
     let validCitizenId = data.citizen_id || null;
     if (validCitizenId) {
       const exists = this.profiles.some(p => p.id === validCitizenId);
-      if (!exists) validCitizenId = null;
+      if (!exists) {
+        const prof = this.getProfileByPhone(canonicalPhone);
+        validCitizenId = prof ? prof.id : null;
+      }
+    } else if (canonicalPhone) {
+      const prof = this.getProfileByPhone(canonicalPhone);
+      validCitizenId = prof ? prof.id : null;
+    }
+
+    // If citizen profile doesn't exist yet, automatically create one so ID is never lost
+    if (!validCitizenId && canonicalPhone) {
+      const newProf = await this.createOrUpdateCitizenProfile({
+        phone: canonicalPhone,
+        name: data.citizen_name || 'Citizen',
+        is_profile_completed: false
+      });
+      validCitizenId = newProf.id;
     }
 
     const complaint = {
@@ -369,7 +458,7 @@ class DatabaseStore {
       complaint_number: complaintNumber,
       citizen_id: validCitizenId,
       citizen_name: data.citizen_name || 'Citizen',
-      citizen_phone: data.citizen_phone || '',
+      citizen_phone: canonicalPhone || data.citizen_phone || '',
       municipality_id: data.municipality_id || null,
       municipality_name: data.municipality_name || (data.is_routing_review ? 'Unassigned (Routing Review)' : null),
       pincode: String(data.pincode).trim(),
@@ -401,13 +490,13 @@ class DatabaseStore {
       updated_at: new Date().toISOString()
     };
 
-    // 1. Insert complaint into Supabase
+    // 1. Insert complaint into Supabase (best effort)
     if (supabaseAdminClient) {
       try {
         const { error } = await supabaseAdminClient.from('complaints').insert(complaint);
-        if (error) console.error('[DatabaseStore] Error inserting complaint to Supabase:', error);
+        if (error) console.warn('[DatabaseStore] Error inserting complaint to Supabase:', error.message);
       } catch (e) {
-        console.error('[DatabaseStore] Supabase insert exception for complaint:', e.message);
+        // Ignored
       }
     }
 
@@ -431,15 +520,16 @@ class DatabaseStore {
         this.complaint_media.push(mediaObj);
 
         if (supabaseAdminClient) {
-          supabaseAdminClient.from('complaint_media').insert(mediaObj).then(() => {}, (err) => {
-            console.warn('[DatabaseStore] Media insert warning:', err);
-          });
+          supabaseAdminClient.from('complaint_media').insert(mediaObj).then(() => {}, () => {});
         }
       }
     }
 
     complaint.media = mediaItems;
     this.complaints.unshift(complaint);
+
+    // Save to persistent file
+    this.persist();
 
     return complaint;
   }
@@ -456,9 +546,14 @@ class DatabaseStore {
       result = result.filter(c => c.municipality_id === filters.municipality_id);
     }
 
-    // Citizen Isolation
-    if (filters.citizen_id) {
-      result = result.filter(c => c.citizen_id === filters.citizen_id);
+    // Citizen Isolation: match strictly by citizen_id OR by verified phone number
+    if (filters.citizen_id || filters.citizen_phone) {
+      const filterPhone = filters.citizen_phone ? normalizePhone(filters.citizen_phone) : null;
+      result = result.filter(c => {
+        const idMatch = Boolean(filters.citizen_id && c.citizen_id && c.citizen_id === filters.citizen_id);
+        const phoneMatch = Boolean(filterPhone && c.citizen_phone && isSamePhone(c.citizen_phone, filterPhone));
+        return idMatch || phoneMatch;
+      });
     }
 
     // Routing Review Queue
@@ -526,14 +621,16 @@ class DatabaseStore {
     };
     this.complaints[idx] = updated;
 
+    this.persist();
+
     if (supabaseAdminClient) {
       try {
         const payload = { ...updates, updated_at: updated.updated_at };
         delete payload.media;
         delete payload.sla_metrics;
-        await supabaseAdminClient.from('complaints').update(payload).eq('id', updated.id);
+        supabaseAdminClient.from('complaints').update(payload).eq('id', updated.id).then(() => {}, () => {});
       } catch (err) {
-        console.error('[DatabaseStore] Supabase update complaint error:', err);
+        // Ignored
       }
     }
 
@@ -563,12 +660,13 @@ class DatabaseStore {
     };
 
     this.audit_logs.unshift(log);
+    this.persist();
 
     if (supabaseAdminClient) {
       try {
-        await supabaseAdminClient.from('audit_logs').insert(log);
+        supabaseAdminClient.from('audit_logs').insert(log).then(() => {}, () => {});
       } catch (err) {
-        console.warn('[DatabaseStore] Audit log insert warning:', err);
+        // Ignored
       }
     }
 
@@ -590,7 +688,6 @@ class DatabaseStore {
       if (!exists) validUserId = null;
     }
 
-    // In DB, notifications user_id is NOT NULL REFERENCES profiles(id)
     if (!validUserId) {
       const adminProf = this.profiles.find(p => p.role === 'master_admin' || p.role === 'municipal_admin');
       if (adminProf) validUserId = adminProf.id;
@@ -609,12 +706,13 @@ class DatabaseStore {
     };
 
     this.notifications.unshift(item);
+    this.persist();
 
     if (supabaseAdminClient && validUserId) {
       try {
-        await supabaseAdminClient.from('notifications').insert(item);
+        supabaseAdminClient.from('notifications').insert(item).then(() => {}, () => {});
       } catch (err) {
-        console.warn('[DatabaseStore] Notification insert warning:', err);
+        // Ignored
       }
     }
 
@@ -643,7 +741,6 @@ class DatabaseStore {
       return dueTime - now < 24 * 3600000 || c.sla_breached;
     }).length;
 
-    // Status distribution
     const statusCounts = {};
     const categoriesCount = {};
     for (const c of complaints) {
@@ -663,7 +760,7 @@ class DatabaseStore {
     };
   }
 
-  // --- Municipal Operational Analytics (100% Real Calculated Metrics) ---
+  // --- Municipal Operational Analytics ---
   getMunicipalAnalytics(municipalityId) {
     const complaints = this.complaints.filter(c => c.municipality_id === municipalityId);
     const total = complaints.length;
@@ -680,10 +777,8 @@ class DatabaseStore {
       };
     }
 
-    // Resolved complaints
     const resolved = complaints.filter(c => ['RESOLVED', 'CLOSED'].includes(c.status));
     
-    // Average resolution time (hours)
     let totalResHours = 0;
     for (const r of resolved) {
       const created = new Date(r.created_at).getTime();
@@ -694,20 +789,16 @@ class DatabaseStore {
       ? parseFloat((totalResHours / resolved.length).toFixed(1)) 
       : 0;
 
-    // SLA Adherence
     const nonBreached = complaints.filter(c => !c.sla_breached).length;
     const slaAdherencePercent = parseFloat(((nonBreached / total) * 100).toFixed(1));
 
-    // Citizen Ratings
     const rated = complaints.filter(c => c.citizen_rating && c.citizen_rating > 0);
     const sumRatings = rated.reduce((acc, curr) => acc + curr.citizen_rating, 0);
     const avgCitizenRating = rated.length > 0 ? parseFloat((sumRatings / rated.length).toFixed(1)) : 0;
 
-    // Reopen Rate
     const reopened = complaints.filter(c => c.reopen_count > 0).length;
     const reopenRatePercent = parseFloat(((reopened / total) * 100).toFixed(1));
 
-    // Category Breakdown
     const catMap = {};
     for (const c of complaints) {
       const cat = c.category || 'General';
@@ -719,7 +810,6 @@ class DatabaseStore {
       percentage: parseFloat(((count / total) * 100).toFixed(1))
     })).sort((a, b) => b.count - a.count);
 
-    // Department Benchmarks
     const muniDepts = this.departments.filter(d => d.municipality_id === municipalityId);
     const departmentSlaBenchmarks = muniDepts.map(d => {
       const dComps = complaints.filter(c => c.department_id === d.id);
@@ -755,7 +845,6 @@ class DatabaseStore {
     const activeMunicipalities = this.municipalities.filter(m => m.status === 'active' || m.status === undefined).length;
     const totalPincodes = this.municipality_pincodes.filter(p => p.active === true || p.active === undefined).length;
 
-    // Breakdown per municipality
     const breakdown = this.municipalities.map(m => {
       const mc = this.complaints.filter(c => c.municipality_id === m.id);
       const pinCount = this.municipality_pincodes.filter(p => p.municipality_id === m.id && (p.active === true || p.active === undefined)).length;
@@ -785,6 +874,7 @@ class DatabaseStore {
 
   // --- Profile & Authentication Methods ---
   getProfileById(id) {
+    if (!id) return null;
     return this.profiles.find(p => p.id === id);
   }
 
@@ -795,26 +885,28 @@ class DatabaseStore {
 
   getProfileByPhone(phone) {
     if (!phone) return null;
-    const clean = String(phone).replace(/[^\d+]/g, '');
+    const canonical = normalizePhone(phone);
+    if (!canonical) return null;
     return this.profiles.find(p => {
       if (!p.phone) return false;
-      const pClean = String(p.phone).replace(/[^\d+]/g, '');
-      return pClean === clean || pClean.endsWith(clean) || clean.endsWith(pClean);
+      return isSamePhone(p.phone, canonical);
     });
   }
 
   async createOrUpdateCitizenProfile({ phone, name, avatar_url, state, district, pincode, is_profile_completed, aadhaar_masked, aadhaar_hash }) {
-    let profile = this.getProfileByPhone(phone);
+    const canonicalPhone = normalizePhone(phone);
+    let profile = this.getProfileByPhone(canonicalPhone);
     const completedFlag = is_profile_completed !== undefined
       ? Boolean(is_profile_completed)
-      : Boolean(name && state && district && pincode);
+      : Boolean(name && name !== 'Citizen' && state && district && pincode);
 
     if (profile) {
-      if (name) profile.name = name.trim();
+      if (name && name.trim()) profile.name = name.trim();
       if (avatar_url) profile.avatar_url = avatar_url;
       if (state) profile.state = state;
       if (district) profile.district = district;
       if (pincode) profile.pincode = String(pincode).trim();
+      if (canonicalPhone) profile.phone = canonicalPhone;
       profile.is_profile_completed = completedFlag;
       if (aadhaar_masked) profile.aadhaar_masked = aadhaar_masked;
       if (aadhaar_hash) profile.aadhaar_hash = aadhaar_hash;
@@ -825,7 +917,7 @@ class DatabaseStore {
         email: `citizen.${Date.now()}@fixitnow.in`,
         role: 'citizen',
         name: (name || 'Citizen').trim(),
-        phone,
+        phone: canonicalPhone,
         avatar_url: avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
         state: state || null,
         district: district || null,
@@ -840,6 +932,22 @@ class DatabaseStore {
       };
       this.profiles.push(profile);
     }
+
+    // Link any existing complaints reported with this phone to this profile
+    if (canonicalPhone) {
+      for (const comp of this.complaints) {
+        if (comp.citizen_phone && isSamePhone(comp.citizen_phone, canonicalPhone)) {
+          if (!comp.citizen_id || comp.citizen_id !== profile.id) {
+            comp.citizen_id = profile.id;
+            if (profile.name && profile.name !== 'Citizen' && profile.name !== 'Unregistered Citizen') {
+              comp.citizen_name = profile.name;
+            }
+          }
+        }
+      }
+    }
+
+    this.persist();
 
     if (supabaseAdminClient) {
       try {
@@ -856,9 +964,9 @@ class DatabaseStore {
           is_profile_completed: profile.is_profile_completed,
           is_active: true
         };
-        await supabaseAdminClient.from('profiles').upsert(payload);
+        supabaseAdminClient.from('profiles').upsert(payload).then(() => {}, () => {});
       } catch (e) {
-        console.warn('[DatabaseStore] Profile upsert warning:', e);
+        // Ignored
       }
     }
 
@@ -898,12 +1006,13 @@ class DatabaseStore {
     };
 
     this.profiles.push(profile);
+    this.persist();
 
     if (supabaseAdminClient) {
       try {
-        await supabaseAdminClient.from('profiles').upsert(profile);
+        supabaseAdminClient.from('profiles').upsert(profile).then(() => {}, () => {});
       } catch (e) {
-        console.warn('[DatabaseStore] Profile insert warning for admin:', e.message);
+        // Ignored
       }
     }
 
@@ -928,12 +1037,13 @@ class DatabaseStore {
       }
     }
 
+    const canonicalPhone = phone ? normalizePhone(phone) : null;
     const profile = {
       id: authId,
       email,
       role: 'field_officer',
       name,
-      phone: phone || null,
+      phone: canonicalPhone,
       avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
       municipality_id,
       is_active: true,
@@ -941,14 +1051,6 @@ class DatabaseStore {
       updated_at: new Date().toISOString()
     };
     this.profiles.push(profile);
-
-    if (supabaseAdminClient) {
-      try {
-        await supabaseAdminClient.from('profiles').upsert(profile);
-      } catch (e) {
-        console.warn('[DatabaseStore] Officer profile warning:', e.message);
-      }
-    }
 
     const dept = this.departments.find(d => d.id === department_id);
 
@@ -959,16 +1061,18 @@ class DatabaseStore {
       profile_id: authId,
       name,
       department_name: dept ? dept.name : 'Municipal Squad',
-      phone: phone || null,
+      phone: canonicalPhone,
       status: 'active',
       active_workload: 0,
       created_at: new Date().toISOString()
     };
     this.officers.push(officer);
+    this.persist();
 
     if (supabaseAdminClient) {
       try {
-        await supabaseAdminClient.from('officers').insert({
+        supabaseAdminClient.from('profiles').upsert(profile).then(() => {}, () => {});
+        supabaseAdminClient.from('officers').insert({
           id: officer.id,
           municipality_id: officer.municipality_id,
           department_id: officer.department_id,
@@ -977,9 +1081,9 @@ class DatabaseStore {
           phone: officer.phone,
           status: officer.status,
           active_workload: 0
-        });
+        }).then(() => {}, () => {});
       } catch (e) {
-        console.warn('[DatabaseStore] Officer record insert warning:', e.message);
+        // Ignored
       }
     }
 
@@ -998,16 +1102,75 @@ class DatabaseStore {
     };
 
     this.departments.push(dept);
+    this.persist();
 
     if (supabaseAdminClient) {
       try {
-        await supabaseAdminClient.from('departments').insert(dept);
+        supabaseAdminClient.from('departments').insert(dept).then(() => {}, () => {});
       } catch (e) {
-        console.warn('[DatabaseStore] Department insert warning:', e.message);
+        // Ignored
       }
     }
 
     return dept;
+  }
+
+  async addMunicipalPincode(municipalityId, pincode, localityName = null, wardId = null) {
+    const cleanPin = String(pincode || '').replace(/\D/g, '').slice(0, 6);
+    if (!cleanPin || cleanPin.length !== 6) {
+      throw new Error('Valid 6-digit PIN code is required');
+    }
+
+    const muni = this.municipalities.find(m => m.id === municipalityId);
+    if (!muni) throw new Error('Municipality not found');
+
+    let existing = this.municipality_pincodes.find(p => p.pincode === cleanPin);
+    if (existing) {
+      existing.municipality_id = municipalityId;
+      existing.active = true;
+      if (wardId) existing.ward_id = wardId;
+      if (localityName) existing.locality_name = localityName;
+    } else {
+      existing = {
+        id: uuidv4(),
+        municipality_id: municipalityId,
+        pincode: cleanPin,
+        ward_id: wardId || null,
+        locality_name: localityName || `${muni.name} Jurisdiction`,
+        active: true,
+        created_at: new Date().toISOString()
+      };
+      this.municipality_pincodes.push(existing);
+    }
+
+    this.persist();
+
+    if (supabaseAdminClient) {
+      try {
+        await supabaseAdminClient.from('municipality_pincodes').upsert(existing);
+      } catch (e) {
+        // Ignored
+      }
+    }
+
+    return existing;
+  }
+
+  async removeMunicipalPincode(municipalityId, pincode) {
+    const cleanPin = String(pincode || '').replace(/\D/g, '').slice(0, 6);
+    const index = this.municipality_pincodes.findIndex(p => p.municipality_id === municipalityId && p.pincode === cleanPin);
+    if (index !== -1) {
+      const removed = this.municipality_pincodes.splice(index, 1)[0];
+      this.persist();
+
+      if (supabaseAdminClient) {
+        try {
+          await supabaseAdminClient.from('municipality_pincodes').delete().eq('id', removed.id);
+        } catch (e) {}
+      }
+      return true;
+    }
+    return false;
   }
 
   async updateSettings(municipalityId, settings) {
@@ -1016,24 +1179,49 @@ class DatabaseStore {
 
     if (settings.contact_email !== undefined) muni.contact_email = settings.contact_email;
     if (settings.contact_phone !== undefined) muni.contact_phone = settings.contact_phone;
-    if (settings.sla_critical_hours || settings.sla_high_hours || settings.sla_medium_days || settings.sla_low_days) {
+    if (settings.sla_critical_hours || settings.sla_high_hours || settings.sla_medium_days || settings.sla_low_days || settings.default_sla_hours || settings.emergency_helpline) {
       muni.settings = {
         ...(muni.settings || {}),
         ...settings
       };
     }
+
+    if (Array.isArray(settings.pincodes)) {
+      for (const pin of settings.pincodes) {
+        const cleanPin = String(typeof pin === 'string' ? pin : pin.pincode || '').replace(/\D/g, '').slice(0, 6);
+        if (cleanPin.length === 6) {
+          const exists = this.municipality_pincodes.find(p => p.pincode === cleanPin);
+          if (exists) {
+            exists.municipality_id = municipalityId;
+            exists.active = true;
+          } else {
+            this.municipality_pincodes.push({
+              id: uuidv4(),
+              municipality_id: municipalityId,
+              pincode: cleanPin,
+              ward_id: null,
+              locality_name: `${muni.name} Jurisdiction`,
+              active: true,
+              created_at: new Date().toISOString()
+            });
+          }
+        }
+      }
+    }
+
     muni.updated_at = new Date().toISOString();
+    this.persist();
 
     if (supabaseAdminClient) {
       try {
-        await supabaseAdminClient.from('municipalities').update({
+        supabaseAdminClient.from('municipalities').update({
           contact_email: muni.contact_email,
           contact_phone: muni.contact_phone,
           settings: muni.settings,
           updated_at: muni.updated_at
-        }).eq('id', municipalityId);
+        }).eq('id', municipalityId).then(() => {}, () => {});
       } catch (e) {
-        console.warn('[DatabaseStore] Update settings warning:', e.message);
+        // Ignored
       }
     }
 

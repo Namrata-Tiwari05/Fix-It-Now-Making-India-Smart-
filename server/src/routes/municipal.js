@@ -32,4 +32,8 @@ router.get('/analytics', municipalController.getAnalytics);
 router.get('/settings', municipalController.getSettings);
 router.patch('/settings', municipalController.updateSettings);
 
+// Municipal PIN Code Jurisdiction Management
+router.post('/pincodes', municipalController.addPincode);
+router.delete('/pincodes/:pincode', municipalController.removePincode);
+
 export default router;

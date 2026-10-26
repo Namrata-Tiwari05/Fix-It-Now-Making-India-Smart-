@@ -509,5 +509,86 @@ export const municipalController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  /**
+   * Add a new jurisdictional PIN code to this municipality
+   */
+  async addPincode(req, res, next) {
+    try {
+      let municipalityId = req.user.municipality_id;
+      if (req.user.role === 'master_admin' && req.body.municipality_id) {
+        municipalityId = req.body.municipality_id;
+      }
+      if (!municipalityId && db.municipalities.length > 0) {
+        municipalityId = db.municipalities[0].id;
+      }
+
+      const { pincode, locality_name, ward_id } = req.body;
+      const cleanPin = String(pincode || '').replace(/\D/g, '').slice(0, 6);
+      if (!cleanPin || cleanPin.length !== 6) {
+        return errorResponse(res, 'Valid 6-digit PIN code is required', 'INVALID_PINCODE', 400);
+      }
+
+      const entry = await db.addMunicipalPincode(municipalityId, cleanPin, locality_name, ward_id);
+
+      db.addAuditLog({
+        actor_id: req.user.id,
+        actor_role: req.user.role,
+        actor_name: req.user.name,
+        entity: 'municipality_pincodes',
+        entity_id: entry.id,
+        action: 'PINCODE_ADDED',
+        old_value: null,
+        new_value: entry,
+        reason: 'Municipal admin mapped new jurisdictional PIN code'
+      });
+
+      return successResponse(res, entry, 'PIN code added successfully', 201);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * Remove a jurisdictional PIN code from this municipality
+   */
+  async removePincode(req, res, next) {
+    try {
+      let municipalityId = req.user.municipality_id;
+      if (req.user.role === 'master_admin' && req.query.municipality_id) {
+        municipalityId = req.query.municipality_id;
+      }
+      if (!municipalityId && db.municipalities.length > 0) {
+        municipalityId = db.municipalities[0].id;
+      }
+
+      const { pincode } = req.params;
+      const cleanPin = String(pincode || '').replace(/\D/g, '').slice(0, 6);
+      if (!cleanPin || cleanPin.length !== 6) {
+        return errorResponse(res, 'Valid 6-digit PIN code is required', 'INVALID_PINCODE', 400);
+      }
+
+      const removed = await db.removeMunicipalPincode(municipalityId, cleanPin);
+      if (!removed) {
+        return errorResponse(res, 'PIN code not found in this municipality', 'NOT_FOUND', 404);
+      }
+
+      db.addAuditLog({
+        actor_id: req.user.id,
+        actor_role: req.user.role,
+        actor_name: req.user.name,
+        entity: 'municipality_pincodes',
+        entity_id: municipalityId,
+        action: 'PINCODE_REMOVED',
+        old_value: { pincode: cleanPin },
+        new_value: null,
+        reason: 'Municipal admin removed jurisdictional PIN code'
+      });
+
+      return successResponse(res, { removed: true, pincode: cleanPin }, 'PIN code removed successfully');
+    } catch (err) {
+      next(err);
+    }
   }
 };

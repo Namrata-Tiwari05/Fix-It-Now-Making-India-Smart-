@@ -1,0 +1,1629 @@
+{
+  "counter": 8,
+  "municipalities": [
+    {
+      "id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Gorakhpur Municipal Corporation",
+      "code": "GMC-UP",
+      "state": "Uttar Pradesh",
+      "district": "Gorakhpur",
+      "status": "active",
+      "contact_email": "admin.gmc@gorakhpurmc.gov.in",
+      "contact_phone": "+91-551-2333444",
+      "settings": {
+        "sla_critical_hours": 24,
+        "sla_high_hours": 48,
+        "sla_medium_days": 7,
+        "sla_low_days": 14
+      },
+      "created_at": "2026-10-25T18:13:18.391Z"
+    },
+    {
+      "id": "m2222222-2222-2222-2222-222222222222",
+      "name": "Lucknow Municipal Corporation",
+      "code": "LMC-UP",
+      "state": "Uttar Pradesh",
+      "district": "Lucknow",
+      "status": "active",
+      "contact_email": "admin.lmc@lucknowmc.gov.in",
+      "contact_phone": "+91-522-2200111",
+      "settings": {
+        "sla_critical_hours": 24,
+        "sla_high_hours": 48,
+        "sla_medium_days": 7,
+        "sla_low_days": 14
+      },
+      "created_at": "2026-10-25T18:13:18.393Z"
+    },
+    {
+      "id": "m3333333-3333-3333-3333-333333333333",
+      "name": "Varanasi Municipal Corporation",
+      "code": "VMC-UP",
+      "state": "Uttar Pradesh",
+      "district": "Varanasi",
+      "status": "active",
+      "contact_email": "admin.vmc@varanasimc.gov.in",
+      "contact_phone": "+91-542-2221111",
+      "settings": {
+        "sla_critical_hours": 24,
+        "sla_high_hours": 48,
+        "sla_medium_days": 7,
+        "sla_low_days": 14
+      },
+      "created_at": "2026-10-25T18:13:18.393Z"
+    }
+  ],
+  "municipality_pincodes": [
+    {
+      "id": "p1111111-1111-1111-1111-111111111111",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "pincode": "273001",
+      "ward_id": "w1111111-1111-1111-1111-111111111111",
+      "locality_name": "Golghar, Gorakhpur",
+      "active": true
+    },
+    {
+      "id": "p2222222-2222-2222-2222-222222222222",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "pincode": "273002",
+      "ward_id": "w2222222-2222-2222-2222-222222222222",
+      "locality_name": "Civil Lines, Gorakhpur",
+      "active": true
+    },
+    {
+      "id": "p3333333-3333-3333-3333-333333333333",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "pincode": "273013",
+      "ward_id": "w2222222-2222-2222-2222-222222222222",
+      "locality_name": "BRD Medical, Gorakhpur",
+      "active": true
+    },
+    {
+      "id": "p4444444-4444-4444-4444-444444444444",
+      "municipality_id": "m2222222-2222-2222-2222-222222222222",
+      "pincode": "226001",
+      "ward_id": null,
+      "locality_name": "Hazratganj, Lucknow",
+      "active": true
+    },
+    {
+      "id": "p5555555-5555-5555-5555-555555555555",
+      "municipality_id": "m3333333-3333-3333-3333-333333333333",
+      "pincode": "221001",
+      "ward_id": null,
+      "locality_name": "Cantonment, Varanasi",
+      "active": true
+    },
+    {
+      "id": "b2dd924c-59e9-4914-b58d-a688031d962e",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "pincode": "273010",
+      "ward_id": null,
+      "locality_name": "Gorakhnath, Gorakhpur",
+      "active": true,
+      "created_at": "2026-10-25T18:47:31.938Z"
+    },
+    {
+      "id": "1ed91c42-f030-408f-a537-e582584276b4",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "pincode": "273209",
+      "ward_id": null,
+      "locality_name": null,
+      "active": true,
+      "created_at": "2026-10-26T14:30:13.502Z"
+    }
+  ],
+  "wards": [
+    {
+      "id": "w1111111-1111-1111-1111-111111111111",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Ward 12 - Golghar Central",
+      "code": "W-12",
+      "zone": "Zone 1 - Central"
+    },
+    {
+      "id": "w2222222-2222-2222-2222-222222222222",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Ward 15 - Civil Lines",
+      "code": "W-15",
+      "zone": "Zone 1 - Central"
+    }
+  ],
+  "departments": [
+    {
+      "id": "d1111111-1111-1111-1111-111111111111",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Roads & Infrastructure",
+      "code": "ROADS-01",
+      "category_mappings": [
+        "Roads & Footpaths",
+        "Street Lighting",
+        "Roads & Potholes"
+      ],
+      "sla_hours_default": 48
+    },
+    {
+      "id": "d2222222-2222-2222-2222-222222222222",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Water Supply & Drainage",
+      "code": "WATER-01",
+      "category_mappings": [
+        "Drainage & Sewerage",
+        "Water Supply",
+        "Water & Sewage"
+      ],
+      "sla_hours_default": 24
+    },
+    {
+      "id": "d3333333-3333-3333-3333-333333333333",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Solid Waste Management",
+      "code": "SWM-01",
+      "category_mappings": [
+        "Garbage & Sanitation",
+        "Garbage Dump"
+      ],
+      "sla_hours_default": 12
+    },
+    {
+      "id": "1327c4ed-61be-4ff7-8097-be5185397366",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Sanitation & Solid Waste",
+      "code": "SAN-01",
+      "category_mappings": [],
+      "sla_hours_default": 48,
+      "created_at": "2026-10-25T18:17:29.059Z"
+    },
+    {
+      "id": "40dd4861-eb8f-459c-9474-d4427f7b0caa",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Sanitation & Solid Waste",
+      "code": "SAN-01",
+      "category_mappings": [],
+      "sla_hours_default": 48,
+      "created_at": "2026-10-25T18:22:45.818Z"
+    },
+    {
+      "id": "c166e2fd-a876-4866-9868-7ecfe4a4dc1d",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Sanitation & Solid Waste",
+      "code": "SAN-01",
+      "category_mappings": [],
+      "sla_hours_default": 48,
+      "created_at": "2026-10-25T18:44:28.083Z"
+    },
+    {
+      "id": "78953669-3ed1-4a58-84d6-57e4873b5169",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "name": "Sanitation & Solid Waste",
+      "code": "SAN-01",
+      "category_mappings": [],
+      "sla_hours_default": 48,
+      "created_at": "2026-10-25T18:49:07.346Z"
+    }
+  ],
+  "officers": [
+    {
+      "id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "profile_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "name": "Inspector Suresh Yadav",
+      "department_name": "Roads & Infrastructure",
+      "phone": "+919811000003",
+      "status": "active",
+      "active_workload": 5,
+      "created_at": "2026-10-25T18:13:18.393Z"
+    },
+    {
+      "id": "76b25d67-40ec-4247-b164-0e0109af69d4",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "department_id": "1327c4ed-61be-4ff7-8097-be5185397366",
+      "profile_id": "c8c3c82f-a517-4337-8420-92ec15e9443e",
+      "name": "Vikram Singh",
+      "department_name": "Sanitation & Solid Waste",
+      "phone": "+919876543299",
+      "status": "active",
+      "active_workload": 0,
+      "created_at": "2026-10-25T18:17:29.088Z"
+    },
+    {
+      "id": "b1df349f-e59c-4150-98fa-dc1496c42b0c",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "department_id": "40dd4861-eb8f-459c-9474-d4427f7b0caa",
+      "profile_id": "b734c0e8-eda6-46c2-b82a-b89c488dd175",
+      "name": "Vikram Singh",
+      "department_name": "Sanitation & Solid Waste",
+      "phone": "+919876543299",
+      "status": "active",
+      "active_workload": 0,
+      "created_at": "2026-10-25T18:22:46.045Z"
+    },
+    {
+      "id": "eacd2c7e-7a2d-46f6-af18-10a6c12aef4b",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "department_id": "c166e2fd-a876-4866-9868-7ecfe4a4dc1d",
+      "profile_id": "c5c079ad-6b66-4fe8-a0c0-42a6ca069854",
+      "name": "Vikram Singh",
+      "department_name": "Sanitation & Solid Waste",
+      "phone": "+919876543299",
+      "status": "active",
+      "active_workload": 0,
+      "created_at": "2026-10-25T18:44:28.096Z"
+    },
+    {
+      "id": "f7bb7fbc-b3c3-469b-a35e-d9d992c7f828",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "department_id": "78953669-3ed1-4a58-84d6-57e4873b5169",
+      "profile_id": "e9918620-a26b-4c2b-a74e-d3849601292b",
+      "name": "Vikram Singh",
+      "department_name": "Sanitation & Solid Waste",
+      "phone": "+919876543299",
+      "status": "active",
+      "active_workload": 0,
+      "created_at": "2026-10-25T18:49:07.354Z"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "email": "masteradmin@fixitnow.gov",
+      "role": "master_admin",
+      "name": "National Command Admin",
+      "phone": "+919811000001",
+      "state": "Uttar Pradesh",
+      "district": "Lucknow",
+      "pincode": "226001",
+      "is_profile_completed": true,
+      "municipality_id": null,
+      "is_active": true,
+      "created_at": "2026-10-25T18:13:18.393Z",
+      "updated_at": "2026-10-25T18:13:18.393Z"
+    },
+    {
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "email": "admin.gmc@gorakhpurmc.gov.in",
+      "role": "municipal_admin",
+      "name": "GMC Municipal Commissioner",
+      "phone": "+919811000002",
+      "state": "Uttar Pradesh",
+      "district": "Gorakhpur",
+      "pincode": "273001",
+      "is_profile_completed": true,
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "is_active": true,
+      "created_at": "2026-10-25T18:13:18.393Z",
+      "updated_at": "2026-10-25T18:13:18.393Z"
+    },
+    {
+      "id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "email": "officer.roads@gorakhpurmc.gov.in",
+      "role": "field_officer",
+      "name": "Inspector Suresh Yadav",
+      "phone": "+919811000003",
+      "state": "Uttar Pradesh",
+      "district": "Gorakhpur",
+      "pincode": "273001",
+      "is_profile_completed": true,
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "is_active": true,
+      "created_at": "2026-10-25T18:13:18.393Z",
+      "updated_at": "2026-10-25T18:13:18.393Z"
+    },
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "email": "rajesh.kumar@fixitnow.in",
+      "role": "citizen",
+      "name": "Pooja Verma",
+      "phone": "+919876543210",
+      "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "state": "Uttar Pradesh",
+      "district": "Gorakhpur",
+      "pincode": "273001",
+      "is_profile_completed": true,
+      "municipality_id": null,
+      "is_active": true,
+      "created_at": "2026-10-15T18:13:18.393Z",
+      "updated_at": "2026-10-25T18:49:07.278Z"
+    },
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+      "email": "anita.sharma@fixitnow.in",
+      "role": "citizen",
+      "name": "Anita Sharma",
+      "phone": "+919876543211",
+      "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      "state": "Uttar Pradesh",
+      "district": "Gorakhpur",
+      "pincode": "273002",
+      "is_profile_completed": true,
+      "municipality_id": null,
+      "is_active": true,
+      "created_at": "2026-10-20T18:13:18.393Z",
+      "updated_at": "2026-10-20T18:13:18.393Z"
+    },
+    {
+      "id": "c8c3c82f-a517-4337-8420-92ec15e9443e",
+      "email": "officer.vikram@gorakhpurmc.gov.in",
+      "role": "field_officer",
+      "name": "Vikram Singh",
+      "phone": "+919876543299",
+      "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "is_active": true,
+      "created_at": "2026-10-25T18:17:29.088Z",
+      "updated_at": "2026-10-25T18:17:29.088Z"
+    },
+    {
+      "id": "0a7b06ca-992d-4ff9-8923-d0f7a8e3b9f6",
+      "email": "citizen.1792952327616@fixitnow.in",
+      "role": "citizen",
+      "name": "Kavita Sharma",
+      "phone": "+919820078614",
+      "avatar_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "state": "Uttar Pradesh",
+      "district": "Gorakhpur",
+      "pincode": "273001",
+      "is_profile_completed": true,
+      "aadhaar_masked": null,
+      "aadhaar_hash": null,
+      "municipality_id": null,
+      "is_active": true,
+      "created_at": "2026-10-25T18:18:47.617Z",
+      "updated_at": "2026-10-25T18:18:47.625Z"
+    },
+    {
+      "id": "b734c0e8-eda6-46c2-b82a-b89c488dd175",
+      "email": "officer.vikram@gorakhpurmc.gov.in",
+      "role": "field_officer",
+      "name": "Vikram Singh",
+      "phone": "+919876543299",
+      "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "is_active": true,
+      "created_at": "2026-10-25T18:22:46.045Z",
+      "updated_at": "2026-10-25T18:22:46.045Z"
+    },
+    {
+      "id": "c5c079ad-6b66-4fe8-a0c0-42a6ca069854",
+      "email": "officer.vikram@gorakhpurmc.gov.in",
+      "role": "field_officer",
+      "name": "Vikram Singh",
+      "phone": "+919876543299",
+      "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "is_active": true,
+      "created_at": "2026-10-25T18:44:28.096Z",
+      "updated_at": "2026-10-25T18:44:28.096Z"
+    },
+    {
+      "id": "e9918620-a26b-4c2b-a74e-d3849601292b",
+      "email": "officer.vikram@gorakhpurmc.gov.in",
+      "role": "field_officer",
+      "name": "Vikram Singh",
+      "phone": "+919876543299",
+      "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "is_active": true,
+      "created_at": "2026-10-25T18:49:07.354Z",
+      "updated_at": "2026-10-25T18:49:07.354Z"
+    },
+    {
+      "id": "a5e9b611-2e13-4497-9991-8797676291a3",
+      "email": "citizen.1793024773859@fixitnow.in",
+      "role": "citizen",
+      "name": "Shubham Prajapati",
+      "phone": "+918470819583",
+      "avatar_url": "http://localhost:5000/uploads/avatars/avatar-1793024802529-331703499.png",
+      "state": "Uttar Pradesh",
+      "district": "Gorakhpur",
+      "pincode": "273209",
+      "is_profile_completed": true,
+      "aadhaar_masked": null,
+      "aadhaar_hash": null,
+      "municipality_id": null,
+      "is_active": true,
+      "created_at": "2026-10-26T14:26:13.859Z",
+      "updated_at": "2026-10-26T14:26:42.628Z"
+    }
+  ],
+  "complaints": [
+    {
+      "id": "37a72883-6602-4ae9-8b26-6f4516ee5e4e",
+      "complaint_number": "FIX-2026-0008",
+      "citizen_id": "a5e9b611-2e13-4497-9991-8797676291a3",
+      "citizen_name": "Shubham Prajapati",
+      "citizen_phone": "+918470819583",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "municipality_name": "Gorakhpur Municipal Corporation",
+      "pincode": "273209",
+      "ward_id": null,
+      "ward_name": null,
+      "department_id": null,
+      "department_name": null,
+      "assigned_officer_id": null,
+      "assigned_officer_name": null,
+      "address": "Sahjanwa,  Gorakhpur,  Uttar Pradesh, Sector-23,Gida, Main Entry Gate, Gorakhpur, Uttar Pradesh",
+      "landmark": "Sector-23,Gida, Main Entry Gate",
+      "lat": 26.753689,
+      "lng": 83.216934,
+      "category": "Roads & Potholes",
+      "category_confirmed_by_admin": false,
+      "priority": "MEDIUM",
+      "priority_reason": "Standard municipal grievance requiring routine scheduled maintenance.",
+      "status": "SUBMITTED",
+      "description": "Gida sector 23 k entry gate k aas pas road bohot kharab  hai",
+      "is_routing_review": false,
+      "ai_status": "COMPLETED",
+      "due_at": "2026-11-02T14:29:16.475Z",
+      "sla_breached": false,
+      "reopen_count": 0,
+      "citizen_rating": null,
+      "citizen_feedback": null,
+      "citizen_confirmed": false,
+      "created_at": "2026-10-26T14:29:16.476Z",
+      "updated_at": "2026-10-26T14:31:50.023Z",
+      "media": [
+        {
+          "id": "0460b582-349d-4975-a395-02865ec83a72",
+          "complaint_id": "37a72883-6602-4ae9-8b26-6f4516ee5e4e",
+          "type": "image",
+          "storage_path": "http://localhost:5000/uploads/complaints/evidence-1793024894726-117082981.jpg",
+          "caption": null,
+          "is_resolution_proof": false,
+          "created_at": "2026-10-26T14:29:16.521Z"
+        }
+      ]
+    },
+    {
+      "id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "complaint_number": "FIX-2026-0007",
+      "citizen_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "citizen_name": "Pooja Verma",
+      "citizen_phone": "+919876543210",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "municipality_name": "Gorakhpur Municipal Corporation",
+      "pincode": "273001",
+      "ward_id": "w1111111-1111-1111-1111-111111111111",
+      "ward_name": "Ward 12 - Golghar Central",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "department_name": "Roads & Infrastructure",
+      "assigned_officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_officer_name": "Inspector Suresh Yadav",
+      "address": "Park Road, Civil Lines",
+      "landmark": "Opposite State Bank",
+      "lat": null,
+      "lng": null,
+      "category": "Water & Sewage",
+      "category_confirmed_by_admin": false,
+      "priority": "HIGH",
+      "priority_reason": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "status": "RESOLVED",
+      "description": "Deep cave-in and broken water pipe on Park Road near Civil Lines.",
+      "is_routing_review": false,
+      "ai_status": "COMPLETED",
+      "due_at": "2026-10-27T18:49:07.365Z",
+      "sla_breached": false,
+      "reopen_count": 0,
+      "citizen_rating": 5,
+      "citizen_feedback": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "citizen_confirmed": true,
+      "created_at": "2026-10-25T18:49:07.366Z",
+      "updated_at": "2026-10-25T18:49:07.403Z",
+      "media": [],
+      "resolution": {
+        "notes": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+        "submitted_at": "2026-10-25T18:49:07.389Z",
+        "officer_name": "Inspector Suresh Yadav",
+        "evidence": [
+          {
+            "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+            "caption": "Resolution proof"
+          },
+          {
+            "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+            "caption": "Resolution proof"
+          }
+        ]
+      },
+      "resolution_evidence": [
+        {
+          "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+          "caption": "Resolution proof"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+          "caption": "Resolution proof"
+        }
+      ],
+      "resolution_verified_by_admin": true
+    },
+    {
+      "id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "complaint_number": "FIX-2026-0006",
+      "citizen_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "citizen_name": "Pooja Verma",
+      "citizen_phone": "+919876543210",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "municipality_name": "Gorakhpur Municipal Corporation",
+      "pincode": "273001",
+      "ward_id": "w1111111-1111-1111-1111-111111111111",
+      "ward_name": "Ward 12 - Golghar Central",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "department_name": "Roads & Infrastructure",
+      "assigned_officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_officer_name": "Inspector Suresh Yadav",
+      "address": "Park Road, Civil Lines",
+      "landmark": "Opposite State Bank",
+      "lat": null,
+      "lng": null,
+      "category": "Water & Sewage",
+      "category_confirmed_by_admin": false,
+      "priority": "HIGH",
+      "priority_reason": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "status": "RESOLVED",
+      "description": "Deep cave-in and broken water pipe on Park Road near Civil Lines.",
+      "is_routing_review": false,
+      "ai_status": "COMPLETED",
+      "due_at": "2026-10-27T18:44:28.117Z",
+      "sla_breached": false,
+      "reopen_count": 0,
+      "citizen_rating": 5,
+      "citizen_feedback": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "citizen_confirmed": true,
+      "created_at": "2026-10-25T18:44:28.118Z",
+      "updated_at": "2026-10-25T18:44:28.188Z",
+      "media": [],
+      "resolution": {
+        "notes": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+        "submitted_at": "2026-10-25T18:44:28.162Z",
+        "officer_name": "Inspector Suresh Yadav",
+        "evidence": [
+          {
+            "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+            "caption": "Resolution proof"
+          },
+          {
+            "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+            "caption": "Resolution proof"
+          }
+        ]
+      },
+      "resolution_evidence": [
+        {
+          "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+          "caption": "Resolution proof"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+          "caption": "Resolution proof"
+        }
+      ],
+      "resolution_verified_by_admin": true
+    },
+    {
+      "id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "complaint_number": "FIX-2026-0005",
+      "citizen_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "citizen_name": "Pooja Verma",
+      "citizen_phone": "+919876543210",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "municipality_name": "Gorakhpur Municipal Corporation",
+      "pincode": "273001",
+      "ward_id": "w1111111-1111-1111-1111-111111111111",
+      "ward_name": "Ward 12 - Golghar Central",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "department_name": "Roads & Infrastructure",
+      "assigned_officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_officer_name": "Inspector Suresh Yadav",
+      "address": "Park Road, Civil Lines",
+      "landmark": "Opposite State Bank",
+      "lat": null,
+      "lng": null,
+      "category": "Water & Sewage",
+      "category_confirmed_by_admin": false,
+      "priority": "HIGH",
+      "priority_reason": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "status": "RESOLVED",
+      "description": "Deep cave-in and broken water pipe on Park Road near Civil Lines.",
+      "is_routing_review": false,
+      "ai_status": "COMPLETED",
+      "due_at": "2026-10-27T18:22:46.324Z",
+      "sla_breached": false,
+      "reopen_count": 0,
+      "citizen_rating": 5,
+      "citizen_feedback": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "citizen_confirmed": true,
+      "created_at": "2026-10-25T18:22:46.325Z",
+      "updated_at": "2026-10-25T18:22:46.727Z",
+      "media": [],
+      "resolution": {
+        "notes": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+        "submitted_at": "2026-10-25T18:22:46.609Z",
+        "officer_name": "Inspector Suresh Yadav",
+        "evidence": [
+          {
+            "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+            "caption": "Resolution proof"
+          },
+          {
+            "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+            "caption": "Resolution proof"
+          }
+        ]
+      },
+      "resolution_evidence": [
+        {
+          "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+          "caption": "Resolution proof"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+          "caption": "Resolution proof"
+        }
+      ],
+      "resolution_verified_by_admin": true
+    },
+    {
+      "id": "e55740d3-f589-412e-ba74-dc680f4f690c",
+      "complaint_number": "FIX-2026-0004",
+      "citizen_id": "0a7b06ca-992d-4ff9-8923-d0f7a8e3b9f6",
+      "citizen_name": "Kavita Sharma",
+      "citizen_phone": "+919820078614",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "municipality_name": "Gorakhpur Municipal Corporation",
+      "pincode": "273001",
+      "ward_id": "w1111111-1111-1111-1111-111111111111",
+      "ward_name": "Ward 12 - Golghar Central",
+      "department_id": null,
+      "department_name": null,
+      "assigned_officer_id": null,
+      "assigned_officer_name": null,
+      "address": "Near Golghar Market",
+      "landmark": "",
+      "lat": null,
+      "lng": null,
+      "category": "Drainage & Sewerage",
+      "category_confirmed_by_admin": false,
+      "priority": "HIGH",
+      "priority_reason": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "status": "SUBMITTED",
+      "description": "Broken manhole cover near Golghar Market causing hazard.",
+      "is_routing_review": false,
+      "ai_status": "COMPLETED",
+      "due_at": "2026-10-27T18:18:47.658Z",
+      "sla_breached": false,
+      "reopen_count": 0,
+      "citizen_rating": null,
+      "citizen_feedback": null,
+      "citizen_confirmed": false,
+      "created_at": "2026-10-25T18:18:47.659Z",
+      "updated_at": "2026-10-25T18:18:47.659Z",
+      "media": []
+    },
+    {
+      "id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "complaint_number": "FIX-2026-0003",
+      "citizen_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "citizen_name": "Pooja Verma",
+      "citizen_phone": "+919876543210",
+      "municipality_id": "m1111111-1111-1111-1111-111111111111",
+      "municipality_name": "Gorakhpur Municipal Corporation",
+      "pincode": "273001",
+      "ward_id": "w1111111-1111-1111-1111-111111111111",
+      "ward_name": "Ward 12 - Golghar Central",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "department_name": "Roads & Infrastructure",
+      "assigned_officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_officer_name": "Inspector Suresh Yadav",
+      "address": "Park Road, Civil Lines",
+      "landmark": "Opposite State Bank",
+      "lat": null,
+      "lng": null,
+      "category": "Water & Sewage",
+      "category_confirmed_by_admin": false,
+      "priority": "HIGH",
+      "priority_reason": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "status": "RESOLVED",
+      "description": "Deep cave-in and broken water pipe on Park Road near Civil Lines.",
+      "is_routing_review": false,
+      "ai_status": "COMPLETED",
+      "due_at": "2026-10-27T18:17:29.141Z",
+      "sla_breached": false,
+      "reopen_count": 0,
+      "citizen_rating": 5,
+      "citizen_feedback": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "citizen_confirmed": true,
+      "created_at": "2026-10-25T18:17:29.142Z",
+      "updated_at": "2026-10-25T18:17:29.353Z",
+      "media": [],
+      "resolution": {
+        "notes": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+        "submitted_at": "2026-10-25T18:17:29.273Z",
+        "officer_name": "Inspector Suresh Yadav",
+        "evidence": [
+          {
+            "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+            "caption": "Resolution proof"
+          },
+          {
+            "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+            "caption": "Resolution proof"
+          }
+        ]
+      },
+      "resolution_evidence": [
+        {
+          "url": "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500",
+          "caption": "Resolution proof"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500",
+          "caption": "Resolution proof"
+        }
+      ],
+      "resolution_verified_by_admin": true
+    }
+  ],
+  "complaint_media": [
+    {
+      "id": "0460b582-349d-4975-a395-02865ec83a72",
+      "complaint_id": "37a72883-6602-4ae9-8b26-6f4516ee5e4e",
+      "type": "image",
+      "storage_path": "http://localhost:5000/uploads/complaints/evidence-1793024894726-117082981.jpg",
+      "caption": null,
+      "is_resolution_proof": false,
+      "created_at": "2026-10-26T14:29:16.521Z"
+    }
+  ],
+  "ai_analyses": [
+    {
+      "id": "bfed7494-cf38-4d92-86dc-c3cb1d2dd26b",
+      "complaint_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "category": "Roads & Potholes",
+      "confidence": 0.96,
+      "duplicate_score": 0.1,
+      "priority": "HIGH",
+      "extracted_data": {
+        "water_involvement": true
+      },
+      "reasoning": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "model_version": "v1.0-civic-triage",
+      "created_at": "2026-10-25T18:17:29.153Z"
+    },
+    {
+      "id": "f640d620-a06e-4f62-8b0a-c6e8bec8ee8f",
+      "complaint_id": "e55740d3-f589-412e-ba74-dc680f4f690c",
+      "category": "Drainage & Sewerage",
+      "confidence": 0.95,
+      "duplicate_score": 0.1,
+      "priority": "HIGH",
+      "extracted_data": {
+        "landmark": "near golghar market causing hazard"
+      },
+      "reasoning": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "model_version": "v1.0-civic-triage",
+      "created_at": "2026-10-25T18:18:47.670Z"
+    },
+    {
+      "id": "9ea23ce6-426c-4099-ad13-e8902a4496dd",
+      "complaint_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "category": "Roads & Potholes",
+      "confidence": 0.96,
+      "duplicate_score": 0.1,
+      "priority": "HIGH",
+      "extracted_data": {
+        "water_involvement": true
+      },
+      "reasoning": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "model_version": "v1.0-civic-triage",
+      "created_at": "2026-10-25T18:22:46.419Z"
+    },
+    {
+      "id": "6c6f0793-31ce-4267-a921-c3efd162fb95",
+      "complaint_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "category": "Roads & Potholes",
+      "confidence": 0.96,
+      "duplicate_score": 0.1,
+      "priority": "HIGH",
+      "extracted_data": {
+        "water_involvement": true
+      },
+      "reasoning": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "model_version": "v1.0-civic-triage",
+      "created_at": "2026-10-25T18:44:28.123Z"
+    },
+    {
+      "id": "97a54760-920c-4b9d-8866-fbb2d1a34819",
+      "complaint_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "category": "Roads & Potholes",
+      "confidence": 0.96,
+      "duplicate_score": 0.1,
+      "priority": "HIGH",
+      "extracted_data": {
+        "water_involvement": true
+      },
+      "reasoning": "Direct risk to pedestrian or vehicular safety in active urban transit corridor.",
+      "model_version": "v1.0-civic-triage",
+      "created_at": "2026-10-25T18:49:07.369Z"
+    },
+    {
+      "id": "f7304dba-3f1a-4aec-aba5-b26c9177ad37",
+      "complaint_id": "37a72883-6602-4ae9-8b26-6f4516ee5e4e",
+      "category": "Roads & Potholes",
+      "confidence": 0.96,
+      "duplicate_score": 0.1,
+      "priority": "MEDIUM",
+      "extracted_data": {
+        "landmark": "Public Facility Corridor"
+      },
+      "reasoning": "Standard municipal grievance requiring routine scheduled maintenance.",
+      "model_version": "v1.0-civic-triage",
+      "created_at": "2026-10-26T14:29:16.528Z"
+    }
+  ],
+  "complaint_duplicates": [],
+  "assignments": [
+    {
+      "id": "asg-1792952249208",
+      "complaint_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_by": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "assigned_at": "2026-10-25T18:17:29.208Z",
+      "due_at": "2026-10-27T18:17:29.141Z",
+      "notes": "Dispatched emergency repair team"
+    },
+    {
+      "id": "asg-1792952566464",
+      "complaint_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_by": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "assigned_at": "2026-10-25T18:22:46.464Z",
+      "due_at": "2026-10-27T18:22:46.324Z",
+      "notes": "Dispatched emergency repair team"
+    },
+    {
+      "id": "asg-1792953868145",
+      "complaint_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_by": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "assigned_at": "2026-10-25T18:44:28.145Z",
+      "due_at": "2026-10-27T18:44:28.117Z",
+      "notes": "Dispatched emergency repair team"
+    },
+    {
+      "id": "asg-1792954147380",
+      "complaint_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "department_id": "d1111111-1111-1111-1111-111111111111",
+      "officer_id": "4d98a7c1-fd90-4184-b9de-8cd021e1fb76",
+      "assigned_by": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "assigned_at": "2026-10-25T18:49:07.380Z",
+      "due_at": "2026-10-27T18:49:07.365Z",
+      "notes": "Dispatched emergency repair team"
+    }
+  ],
+  "resolutions": [],
+  "audit_logs": [
+    {
+      "id": "3b23d411-47a5-4f3c-8b19-245ee3e20a33",
+      "actor_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "actor_role": "master_admin",
+      "actor_name": "National Command Admin",
+      "entity": "complaint",
+      "entity_id": "37a72883-6602-4ae9-8b26-6f4516ee5e4e",
+      "action": "MANUAL_ROUTING_ASSIGNMENT",
+      "old_value": "{\"is_routing_review\":true,\"municipality_id\":null}",
+      "new_value": "{\"is_routing_review\":false,\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"municipality_name\":\"Gorakhpur Municipal Corporation\"}",
+      "reason": "This issue is assigned for you, do the best you can",
+      "timestamp": "2026-10-26T14:31:50.026Z"
+    },
+    {
+      "id": "c2f20c9d-c1a6-410a-a846-aa2bd5f48dd8",
+      "actor_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "actor_role": "master_admin",
+      "actor_name": "National Command Admin",
+      "entity": "municipality_pincodes",
+      "entity_id": "m1111111-1111-1111-1111-111111111111",
+      "action": "PINCODES_CONFIGURED",
+      "old_value": null,
+      "new_value": "{\"count\":1,\"pincodes\":[\"273209\"]}",
+      "reason": "Master Admin configured PIN code coverage",
+      "timestamp": "2026-10-26T14:30:13.503Z"
+    },
+    {
+      "id": "670ff702-cb28-4f71-8f2b-d4b5837f161d",
+      "actor_id": "a5e9b611-2e13-4497-9991-8797676291a3",
+      "actor_role": "citizen",
+      "actor_name": "Shubham Prajapati",
+      "entity": "complaint",
+      "entity_id": "37a72883-6602-4ae9-8b26-6f4516ee5e4e",
+      "action": "SUBMITTED",
+      "old_value": null,
+      "new_value": "{\"status\":\"SUBMITTED\",\"category\":\"Roads & Potholes\",\"priority\":\"MEDIUM\",\"pincode\":\"273209\",\"municipality\":\"Unassigned (Routing Review)\"}",
+      "reason": "Citizen grievance submitted.",
+      "timestamp": "2026-10-26T14:29:16.530Z"
+    },
+    {
+      "id": "4c75139d-a7a5-42df-bbf1-629f0596a3f5",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "action": "CITIZEN_CONFIRMED",
+      "old_value": "{\"status\":\"VERIFICATION\"}",
+      "new_value": "{\"status\":\"RESOLVED\",\"rating\":5}",
+      "reason": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "timestamp": "2026-10-25T18:49:07.404Z"
+    },
+    {
+      "id": "f6b8532f-c6cd-46c6-9860-32b10007a2c4",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "action": "RESOLUTION_VERIFIED",
+      "old_value": "{\"status\":\"RESOLUTION_SUBMITTED\"}",
+      "new_value": "{\"status\":\"VERIFICATION\"}",
+      "reason": "Photo evidence inspected and confirmed by zonal supervisor.",
+      "timestamp": "2026-10-25T18:49:07.397Z"
+    },
+    {
+      "id": "afdeb8b3-b848-48c7-89f4-63a10677adc8",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "action": "RESOLUTION_SUBMITTED",
+      "old_value": "{\"status\":\"IN_PROGRESS\"}",
+      "new_value": "{\"status\":\"RESOLUTION_SUBMITTED\",\"resolution\":{\"notes\":\"Replaced cracked section of main pipeline and resurfaced road with cold asphalt.\",\"submitted_at\":\"2026-10-25T18:49:07.389Z\",\"officer_name\":\"Inspector Suresh Yadav\",\"evidence\":[{\"url\":\"https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500\",\"caption\":\"Resolution proof\"},{\"url\":\"https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500\",\"caption\":\"Resolution proof\"}]}}",
+      "reason": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+      "timestamp": "2026-10-25T18:49:07.390Z"
+    },
+    {
+      "id": "7af01b41-42a4-4bc0-9174-9b34a72d4559",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "action": "OFFICER_STATUS_UPDATE",
+      "old_value": "{\"status\":\"ASSIGNED\"}",
+      "new_value": "{\"status\":\"IN_PROGRESS\"}",
+      "reason": "Excavation team on-site. Repairing damaged pipe.",
+      "timestamp": "2026-10-25T18:49:07.385Z"
+    },
+    {
+      "id": "92315b80-9822-4421-8ad1-e5a5412cde21",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "action": "ASSIGNED",
+      "old_value": "{\"status\":\"SUBMITTED\",\"officer\":null}",
+      "new_value": "{\"status\":\"ASSIGNED\",\"officer\":\"Inspector Suresh Yadav\",\"department\":\"Roads & Infrastructure\"}",
+      "reason": "Dispatched emergency repair team",
+      "timestamp": "2026-10-25T18:49:07.380Z"
+    },
+    {
+      "id": "207b2870-7fa5-4c76-b995-d8865498f57f",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "action": "SUBMITTED",
+      "old_value": null,
+      "new_value": "{\"status\":\"SUBMITTED\",\"category\":\"Water & Sewage\",\"priority\":\"HIGH\",\"pincode\":\"273001\",\"municipality\":\"Gorakhpur Municipal Corporation\"}",
+      "reason": "Citizen grievance submitted.",
+      "timestamp": "2026-10-25T18:49:07.369Z"
+    },
+    {
+      "id": "cce58de2-ce56-4ce2-9544-dcdc7b96f5f9",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "officer",
+      "entity_id": "f7bb7fbc-b3c3-469b-a35e-d9d992c7f828",
+      "action": "OFFICER_CREATED",
+      "old_value": null,
+      "new_value": "{\"name\":\"Vikram Singh\",\"email\":\"officer.vikram@gorakhpurmc.gov.in\",\"phone\":\"+919876543299\",\"department_id\":\"78953669-3ed1-4a58-84d6-57e4873b5169\"}",
+      "reason": "Municipal Admin recruited Field Officer",
+      "timestamp": "2026-10-25T18:49:07.355Z"
+    },
+    {
+      "id": "50229749-afe0-4e6b-942b-b78802a9bf8c",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "department",
+      "entity_id": "78953669-3ed1-4a58-84d6-57e4873b5169",
+      "action": "DEPARTMENT_CREATED",
+      "old_value": null,
+      "new_value": "{\"id\":\"78953669-3ed1-4a58-84d6-57e4873b5169\",\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"name\":\"Sanitation & Solid Waste\",\"code\":\"SAN-01\",\"category_mappings\":[],\"sla_hours_default\":48,\"created_at\":\"2026-10-25T18:49:07.346Z\"}",
+      "reason": "Municipal Admin created department",
+      "timestamp": "2026-10-25T18:49:07.347Z"
+    },
+    {
+      "id": "a1fa88b8-9ef7-4c23-9431-f0dab8d61280",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "municipality_pincodes",
+      "entity_id": "b2dd924c-59e9-4914-b58d-a688031d962e",
+      "action": "PINCODE_ADDED",
+      "old_value": null,
+      "new_value": "{\"id\":\"b2dd924c-59e9-4914-b58d-a688031d962e\",\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"pincode\":\"273010\",\"ward_id\":null,\"locality_name\":\"Gorakhnath, Gorakhpur\",\"active\":true,\"created_at\":\"2026-10-25T18:47:31.938Z\"}",
+      "reason": "Municipal admin mapped new jurisdictional PIN code",
+      "timestamp": "2026-10-25T18:48:55.317Z"
+    },
+    {
+      "id": "a8d7e7b5-bcae-41ac-b80f-7da7d8a25b10",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "municipality_pincodes",
+      "entity_id": "b2dd924c-59e9-4914-b58d-a688031d962e",
+      "action": "PINCODE_ADDED",
+      "old_value": null,
+      "new_value": "{\"id\":\"b2dd924c-59e9-4914-b58d-a688031d962e\",\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"pincode\":\"273010\",\"ward_id\":null,\"locality_name\":\"Gorakhnath, Gorakhpur\",\"active\":true,\"created_at\":\"2026-10-25T18:47:31.938Z\"}",
+      "reason": "Municipal admin mapped new jurisdictional PIN code",
+      "timestamp": "2026-10-25T18:47:55.039Z"
+    },
+    {
+      "id": "b3766bc0-3cab-4c7f-9e3c-89975a4d2411",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "municipality_pincodes",
+      "entity_id": "b2dd924c-59e9-4914-b58d-a688031d962e",
+      "action": "PINCODE_ADDED",
+      "old_value": null,
+      "new_value": "{\"id\":\"b2dd924c-59e9-4914-b58d-a688031d962e\",\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"pincode\":\"273010\",\"ward_id\":null,\"locality_name\":\"Gorakhnath, Gorakhpur\",\"active\":true,\"created_at\":\"2026-10-25T18:47:31.938Z\"}",
+      "reason": "Municipal admin mapped new jurisdictional PIN code",
+      "timestamp": "2026-10-25T18:47:31.949Z"
+    },
+    {
+      "id": "e80b4813-b7e3-4891-b31b-6135507e6096",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "action": "CITIZEN_CONFIRMED",
+      "old_value": "{\"status\":\"VERIFICATION\"}",
+      "new_value": "{\"status\":\"RESOLVED\",\"rating\":5}",
+      "reason": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "timestamp": "2026-10-25T18:44:28.189Z"
+    },
+    {
+      "id": "2fa5fa02-eb24-4d04-bcd5-fcbb52e5164e",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "action": "RESOLUTION_VERIFIED",
+      "old_value": "{\"status\":\"RESOLUTION_SUBMITTED\"}",
+      "new_value": "{\"status\":\"VERIFICATION\"}",
+      "reason": "Photo evidence inspected and confirmed by zonal supervisor.",
+      "timestamp": "2026-10-25T18:44:28.176Z"
+    },
+    {
+      "id": "9b54d5a8-0f83-4640-8b6f-836f731edd5d",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "action": "RESOLUTION_SUBMITTED",
+      "old_value": "{\"status\":\"IN_PROGRESS\"}",
+      "new_value": "{\"status\":\"RESOLUTION_SUBMITTED\",\"resolution\":{\"notes\":\"Replaced cracked section of main pipeline and resurfaced road with cold asphalt.\",\"submitted_at\":\"2026-10-25T18:44:28.162Z\",\"officer_name\":\"Inspector Suresh Yadav\",\"evidence\":[{\"url\":\"https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500\",\"caption\":\"Resolution proof\"},{\"url\":\"https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500\",\"caption\":\"Resolution proof\"}]}}",
+      "reason": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+      "timestamp": "2026-10-25T18:44:28.164Z"
+    },
+    {
+      "id": "5f17b947-d35d-4c23-8c76-fee887d523b8",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "action": "OFFICER_STATUS_UPDATE",
+      "old_value": "{\"status\":\"ASSIGNED\"}",
+      "new_value": "{\"status\":\"IN_PROGRESS\"}",
+      "reason": "Excavation team on-site. Repairing damaged pipe.",
+      "timestamp": "2026-10-25T18:44:28.154Z"
+    },
+    {
+      "id": "65c58101-26eb-409a-82ae-148f03247249",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "action": "ASSIGNED",
+      "old_value": "{\"status\":\"SUBMITTED\",\"officer\":null}",
+      "new_value": "{\"status\":\"ASSIGNED\",\"officer\":\"Inspector Suresh Yadav\",\"department\":\"Roads & Infrastructure\"}",
+      "reason": "Dispatched emergency repair team",
+      "timestamp": "2026-10-25T18:44:28.145Z"
+    },
+    {
+      "id": "2cc036df-f7db-4499-871b-2bec37f89610",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "action": "SUBMITTED",
+      "old_value": null,
+      "new_value": "{\"status\":\"SUBMITTED\",\"category\":\"Water & Sewage\",\"priority\":\"HIGH\",\"pincode\":\"273001\",\"municipality\":\"Gorakhpur Municipal Corporation\"}",
+      "reason": "Citizen grievance submitted.",
+      "timestamp": "2026-10-25T18:44:28.124Z"
+    },
+    {
+      "id": "c8e1eb90-a24a-4674-87f3-f16cf805fe7a",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "officer",
+      "entity_id": "eacd2c7e-7a2d-46f6-af18-10a6c12aef4b",
+      "action": "OFFICER_CREATED",
+      "old_value": null,
+      "new_value": "{\"name\":\"Vikram Singh\",\"email\":\"officer.vikram@gorakhpurmc.gov.in\",\"phone\":\"+919876543299\",\"department_id\":\"c166e2fd-a876-4866-9868-7ecfe4a4dc1d\"}",
+      "reason": "Municipal Admin recruited Field Officer",
+      "timestamp": "2026-10-25T18:44:28.098Z"
+    },
+    {
+      "id": "02d62bb8-578d-49c4-9bdb-c9f1b1708578",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "department",
+      "entity_id": "c166e2fd-a876-4866-9868-7ecfe4a4dc1d",
+      "action": "DEPARTMENT_CREATED",
+      "old_value": null,
+      "new_value": "{\"id\":\"c166e2fd-a876-4866-9868-7ecfe4a4dc1d\",\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"name\":\"Sanitation & Solid Waste\",\"code\":\"SAN-01\",\"category_mappings\":[],\"sla_hours_default\":48,\"created_at\":\"2026-10-25T18:44:28.083Z\"}",
+      "reason": "Municipal Admin created department",
+      "timestamp": "2026-10-25T18:44:28.085Z"
+    },
+    {
+      "id": "f2a69106-07ec-4521-b0a8-03a85672a6df",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "action": "CITIZEN_CONFIRMED",
+      "old_value": "{\"status\":\"VERIFICATION\"}",
+      "new_value": "{\"status\":\"RESOLVED\",\"rating\":5}",
+      "reason": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "timestamp": "2026-10-25T18:22:46.732Z"
+    },
+    {
+      "id": "6d916b7a-f4e7-4276-ab41-384917ddd381",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "action": "RESOLUTION_VERIFIED",
+      "old_value": "{\"status\":\"RESOLUTION_SUBMITTED\"}",
+      "new_value": "{\"status\":\"VERIFICATION\"}",
+      "reason": "Photo evidence inspected and confirmed by zonal supervisor.",
+      "timestamp": "2026-10-25T18:22:46.695Z"
+    },
+    {
+      "id": "6a830bcc-974a-433e-bf94-070111386b1c",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "action": "RESOLUTION_SUBMITTED",
+      "old_value": "{\"status\":\"IN_PROGRESS\"}",
+      "new_value": "{\"status\":\"RESOLUTION_SUBMITTED\",\"resolution\":{\"notes\":\"Replaced cracked section of main pipeline and resurfaced road with cold asphalt.\",\"submitted_at\":\"2026-10-25T18:22:46.609Z\",\"officer_name\":\"Inspector Suresh Yadav\",\"evidence\":[{\"url\":\"https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500\",\"caption\":\"Resolution proof\"},{\"url\":\"https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500\",\"caption\":\"Resolution proof\"}]}}",
+      "reason": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+      "timestamp": "2026-10-25T18:22:46.652Z"
+    },
+    {
+      "id": "9e1fedbe-204a-43a4-85b9-3cf5d5f7e85c",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "action": "OFFICER_STATUS_UPDATE",
+      "old_value": "{\"status\":\"ASSIGNED\"}",
+      "new_value": "{\"status\":\"IN_PROGRESS\"}",
+      "reason": "Excavation team on-site. Repairing damaged pipe.",
+      "timestamp": "2026-10-25T18:22:46.585Z"
+    },
+    {
+      "id": "e6621834-b7bb-43dd-986a-a231e9807549",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "action": "ASSIGNED",
+      "old_value": "{\"status\":\"SUBMITTED\",\"officer\":null}",
+      "new_value": "{\"status\":\"ASSIGNED\",\"officer\":\"Inspector Suresh Yadav\",\"department\":\"Roads & Infrastructure\"}",
+      "reason": "Dispatched emergency repair team",
+      "timestamp": "2026-10-25T18:22:46.464Z"
+    },
+    {
+      "id": "75b19496-b725-4070-8ec6-9fbc14e73dc8",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "action": "SUBMITTED",
+      "old_value": null,
+      "new_value": "{\"status\":\"SUBMITTED\",\"category\":\"Water & Sewage\",\"priority\":\"HIGH\",\"pincode\":\"273001\",\"municipality\":\"Gorakhpur Municipal Corporation\"}",
+      "reason": "Citizen grievance submitted.",
+      "timestamp": "2026-10-25T18:22:46.419Z"
+    },
+    {
+      "id": "20aa5c80-03a5-4cdd-bfab-eb29f01a9d78",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "officer",
+      "entity_id": "b1df349f-e59c-4150-98fa-dc1496c42b0c",
+      "action": "OFFICER_CREATED",
+      "old_value": null,
+      "new_value": "{\"name\":\"Vikram Singh\",\"email\":\"officer.vikram@gorakhpurmc.gov.in\",\"phone\":\"+919876543299\",\"department_id\":\"40dd4861-eb8f-459c-9474-d4427f7b0caa\"}",
+      "reason": "Municipal Admin recruited Field Officer",
+      "timestamp": "2026-10-25T18:22:46.049Z"
+    },
+    {
+      "id": "67191553-052b-4ed8-ba09-7a11ddb0b081",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "department",
+      "entity_id": "40dd4861-eb8f-459c-9474-d4427f7b0caa",
+      "action": "DEPARTMENT_CREATED",
+      "old_value": null,
+      "new_value": "{\"id\":\"40dd4861-eb8f-459c-9474-d4427f7b0caa\",\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"name\":\"Sanitation & Solid Waste\",\"code\":\"SAN-01\",\"category_mappings\":[],\"sla_hours_default\":48,\"created_at\":\"2026-10-25T18:22:45.818Z\"}",
+      "reason": "Municipal Admin created department",
+      "timestamp": "2026-10-25T18:22:45.822Z"
+    },
+    {
+      "id": "5873f43d-5332-48f0-848b-5b08e247e8eb",
+      "actor_id": "0a7b06ca-992d-4ff9-8923-d0f7a8e3b9f6",
+      "actor_role": "citizen",
+      "actor_name": "Kavita Sharma",
+      "entity": "complaint",
+      "entity_id": "e55740d3-f589-412e-ba74-dc680f4f690c",
+      "action": "SUBMITTED",
+      "old_value": null,
+      "new_value": "{\"status\":\"SUBMITTED\",\"category\":\"Drainage & Sewerage\",\"priority\":\"HIGH\",\"pincode\":\"273001\",\"municipality\":\"Gorakhpur Municipal Corporation\"}",
+      "reason": "Citizen grievance submitted.",
+      "timestamp": "2026-10-25T18:18:47.671Z"
+    },
+    {
+      "id": "667e5649-ea02-4d84-b734-18996aa0b81d",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "action": "CITIZEN_CONFIRMED",
+      "old_value": "{\"status\":\"VERIFICATION\"}",
+      "new_value": "{\"status\":\"RESOLVED\",\"rating\":5}",
+      "reason": "Prompt and high quality repair work by Gorakhpur Municipal Corporation!",
+      "timestamp": "2026-10-25T18:17:29.357Z"
+    },
+    {
+      "id": "ff7638ac-7216-484d-8185-0953ad0ea53e",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "action": "RESOLUTION_VERIFIED",
+      "old_value": "{\"status\":\"RESOLUTION_SUBMITTED\"}",
+      "new_value": "{\"status\":\"VERIFICATION\"}",
+      "reason": "Photo evidence inspected and confirmed by zonal supervisor.",
+      "timestamp": "2026-10-25T18:17:29.315Z"
+    },
+    {
+      "id": "8aff5eca-8011-4dae-8574-c6a0282a839f",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "action": "RESOLUTION_SUBMITTED",
+      "old_value": "{\"status\":\"IN_PROGRESS\"}",
+      "new_value": "{\"status\":\"RESOLUTION_SUBMITTED\",\"resolution\":{\"notes\":\"Replaced cracked section of main pipeline and resurfaced road with cold asphalt.\",\"submitted_at\":\"2026-10-25T18:17:29.273Z\",\"officer_name\":\"Inspector Suresh Yadav\",\"evidence\":[{\"url\":\"https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=500\",\"caption\":\"Resolution proof\"},{\"url\":\"https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=500\",\"caption\":\"Resolution proof\"}]}}",
+      "reason": "Replaced cracked section of main pipeline and resurfaced road with cold asphalt.",
+      "timestamp": "2026-10-25T18:17:29.279Z"
+    },
+    {
+      "id": "6fe649db-b38d-4078-8893-1acefdee1aaf",
+      "actor_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "actor_role": "field_officer",
+      "actor_name": "Inspector Suresh Yadav",
+      "entity": "complaint",
+      "entity_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "action": "OFFICER_STATUS_UPDATE",
+      "old_value": "{\"status\":\"ASSIGNED\"}",
+      "new_value": "{\"status\":\"IN_PROGRESS\"}",
+      "reason": "Excavation team on-site. Repairing damaged pipe.",
+      "timestamp": "2026-10-25T18:17:29.241Z"
+    },
+    {
+      "id": "b3e194e3-154b-49a6-9d67-f522a0650323",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "complaint",
+      "entity_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "action": "ASSIGNED",
+      "old_value": "{\"status\":\"SUBMITTED\",\"officer\":null}",
+      "new_value": "{\"status\":\"ASSIGNED\",\"officer\":\"Inspector Suresh Yadav\",\"department\":\"Roads & Infrastructure\"}",
+      "reason": "Dispatched emergency repair team",
+      "timestamp": "2026-10-25T18:17:29.209Z"
+    },
+    {
+      "id": "d908802d-6abc-449c-bf6f-052e57c39f67",
+      "actor_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "actor_role": "citizen",
+      "actor_name": "Pooja Verma",
+      "entity": "complaint",
+      "entity_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "action": "SUBMITTED",
+      "old_value": null,
+      "new_value": "{\"status\":\"SUBMITTED\",\"category\":\"Water & Sewage\",\"priority\":\"HIGH\",\"pincode\":\"273001\",\"municipality\":\"Gorakhpur Municipal Corporation\"}",
+      "reason": "Citizen grievance submitted.",
+      "timestamp": "2026-10-25T18:17:29.153Z"
+    },
+    {
+      "id": "1323e247-5e11-46d0-82ab-60d35313bf9d",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "officer",
+      "entity_id": "76b25d67-40ec-4247-b164-0e0109af69d4",
+      "action": "OFFICER_CREATED",
+      "old_value": null,
+      "new_value": "{\"name\":\"Vikram Singh\",\"email\":\"officer.vikram@gorakhpurmc.gov.in\",\"phone\":\"+919876543299\",\"department_id\":\"1327c4ed-61be-4ff7-8097-be5185397366\"}",
+      "reason": "Municipal Admin recruited Field Officer",
+      "timestamp": "2026-10-25T18:17:29.092Z"
+    },
+    {
+      "id": "a794e7d2-a255-434a-be7e-fd50a59387fb",
+      "actor_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "actor_role": "municipal_admin",
+      "actor_name": "GMC Municipal Commissioner",
+      "entity": "department",
+      "entity_id": "1327c4ed-61be-4ff7-8097-be5185397366",
+      "action": "DEPARTMENT_CREATED",
+      "old_value": null,
+      "new_value": "{\"id\":\"1327c4ed-61be-4ff7-8097-be5185397366\",\"municipality_id\":\"m1111111-1111-1111-1111-111111111111\",\"name\":\"Sanitation & Solid Waste\",\"code\":\"SAN-01\",\"category_mappings\":[],\"sla_hours_default\":48,\"created_at\":\"2026-10-25T18:17:29.059Z\"}",
+      "reason": "Municipal Admin created department",
+      "timestamp": "2026-10-25T18:17:29.067Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "22274d68-9d66-4eca-b7a1-726bb3d015a1",
+      "user_id": "a5e9b611-2e13-4497-9991-8797676291a3",
+      "role": "citizen",
+      "title": "Complaint Registered",
+      "message": "Your grievance FIX-2026-0008 has been logged. Routing review pending.",
+      "type": "STATUS_CHANGE",
+      "complaint_id": "37a72883-6602-4ae9-8b26-6f4516ee5e4e",
+      "is_read": false,
+      "created_at": "2026-10-26T14:29:16.540Z"
+    },
+    {
+      "id": "25ad9130-f7fc-4c27-8f8b-7b9c1b19d3dc",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Resolution Ready for Verification",
+      "message": "Field work on FIX-2026-0007 is completed. Please review proof and confirm.",
+      "type": "RESOLUTION",
+      "complaint_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "is_read": false,
+      "created_at": "2026-10-25T18:49:07.398Z"
+    },
+    {
+      "id": "311da26f-6a28-4e5b-919c-05ec82cad982",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "municipal_admin",
+      "title": "Resolution Submitted: FIX-2026-0007",
+      "message": "Inspector Suresh Yadav submitted resolution for FIX-2026-0007. Verification required.",
+      "type": "RESOLUTION",
+      "complaint_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "is_read": false,
+      "created_at": "2026-10-25T18:49:07.391Z"
+    },
+    {
+      "id": "665f1679-c955-4b21-8dbb-c96fdbf54569",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "role": "municipal_admin",
+      "title": "New Complaint Received",
+      "message": "New HIGH complaint FIX-2026-0007 registered for PIN 273001.",
+      "type": "NEW_COMPLAINT",
+      "complaint_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "is_read": false,
+      "created_at": "2026-10-25T18:49:07.371Z"
+    },
+    {
+      "id": "79b2cbf5-d723-4ad1-ae7c-276aaacdfe6e",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Complaint Registered",
+      "message": "Your grievance FIX-2026-0007 has been logged. Assigned to Gorakhpur Municipal Corporation.",
+      "type": "STATUS_CHANGE",
+      "complaint_id": "05de6d40-b1b2-4699-87f2-5c6ebff54e59",
+      "is_read": false,
+      "created_at": "2026-10-25T18:49:07.370Z"
+    },
+    {
+      "id": "25f11047-b3d7-4366-a93a-4636d8bf2025",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Resolution Ready for Verification",
+      "message": "Field work on FIX-2026-0006 is completed. Please review proof and confirm.",
+      "type": "RESOLUTION",
+      "complaint_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "is_read": false,
+      "created_at": "2026-10-25T18:44:28.178Z"
+    },
+    {
+      "id": "60b5283f-8e07-4508-b65e-366b8c08bcd9",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "municipal_admin",
+      "title": "Resolution Submitted: FIX-2026-0006",
+      "message": "Inspector Suresh Yadav submitted resolution for FIX-2026-0006. Verification required.",
+      "type": "RESOLUTION",
+      "complaint_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "is_read": false,
+      "created_at": "2026-10-25T18:44:28.166Z"
+    },
+    {
+      "id": "e52d8ccd-1fe2-4f6c-8e16-b9a81d9cdda8",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "role": "municipal_admin",
+      "title": "New Complaint Received",
+      "message": "New HIGH complaint FIX-2026-0006 registered for PIN 273001.",
+      "type": "NEW_COMPLAINT",
+      "complaint_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "is_read": false,
+      "created_at": "2026-10-25T18:44:28.127Z"
+    },
+    {
+      "id": "36b87c7e-cc69-4542-b9c5-ab8ca3284c35",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Complaint Registered",
+      "message": "Your grievance FIX-2026-0006 has been logged. Assigned to Gorakhpur Municipal Corporation.",
+      "type": "STATUS_CHANGE",
+      "complaint_id": "04ec522f-4917-4175-ae92-fd03e61e1628",
+      "is_read": false,
+      "created_at": "2026-10-25T18:44:28.125Z"
+    },
+    {
+      "id": "8433d98c-411b-4aee-b322-c6bd77807470",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Resolution Ready for Verification",
+      "message": "Field work on FIX-2026-0005 is completed. Please review proof and confirm.",
+      "type": "RESOLUTION",
+      "complaint_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "is_read": false,
+      "created_at": "2026-10-25T18:22:46.698Z"
+    },
+    {
+      "id": "d83f7a74-1f87-421b-a3d3-e2b3cf3517c6",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "municipal_admin",
+      "title": "Resolution Submitted: FIX-2026-0005",
+      "message": "Inspector Suresh Yadav submitted resolution for FIX-2026-0005. Verification required.",
+      "type": "RESOLUTION",
+      "complaint_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "is_read": false,
+      "created_at": "2026-10-25T18:22:46.661Z"
+    },
+    {
+      "id": "d115923a-a5bb-48f0-b580-26573f35edd5",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "role": "municipal_admin",
+      "title": "New Complaint Received",
+      "message": "New HIGH complaint FIX-2026-0005 registered for PIN 273001.",
+      "type": "NEW_COMPLAINT",
+      "complaint_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "is_read": false,
+      "created_at": "2026-10-25T18:22:46.428Z"
+    },
+    {
+      "id": "b3a752c4-527b-4bb7-939c-ff1a6255afe3",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Complaint Registered",
+      "message": "Your grievance FIX-2026-0005 has been logged. Assigned to Gorakhpur Municipal Corporation.",
+      "type": "STATUS_CHANGE",
+      "complaint_id": "a7144b65-e960-414e-b51b-24a2ab8327c4",
+      "is_read": false,
+      "created_at": "2026-10-25T18:22:46.424Z"
+    },
+    {
+      "id": "2491f611-e166-49f8-b73e-bc89b18ba7c2",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "role": "municipal_admin",
+      "title": "New Complaint Received",
+      "message": "New HIGH complaint FIX-2026-0004 registered for PIN 273001.",
+      "type": "NEW_COMPLAINT",
+      "complaint_id": "e55740d3-f589-412e-ba74-dc680f4f690c",
+      "is_read": false,
+      "created_at": "2026-10-25T18:18:47.676Z"
+    },
+    {
+      "id": "6a7ccc2c-4a4a-42db-a426-39c86a8d9f08",
+      "user_id": "0a7b06ca-992d-4ff9-8923-d0f7a8e3b9f6",
+      "role": "citizen",
+      "title": "Complaint Registered",
+      "message": "Your grievance FIX-2026-0004 has been logged. Assigned to Gorakhpur Municipal Corporation.",
+      "type": "STATUS_CHANGE",
+      "complaint_id": "e55740d3-f589-412e-ba74-dc680f4f690c",
+      "is_read": false,
+      "created_at": "2026-10-25T18:18:47.674Z"
+    },
+    {
+      "id": "74ca611b-e9d2-4e71-a28b-cb821ef21248",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Resolution Ready for Verification",
+      "message": "Field work on FIX-2026-0003 is completed. Please review proof and confirm.",
+      "type": "RESOLUTION",
+      "complaint_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "is_read": false,
+      "created_at": "2026-10-25T18:17:29.319Z"
+    },
+    {
+      "id": "7b23276f-9c90-426c-926e-b48fcd8bb916",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "municipal_admin",
+      "title": "Resolution Submitted: FIX-2026-0003",
+      "message": "Inspector Suresh Yadav submitted resolution for FIX-2026-0003. Verification required.",
+      "type": "RESOLUTION",
+      "complaint_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "is_read": false,
+      "created_at": "2026-10-25T18:17:29.286Z"
+    },
+    {
+      "id": "54d6f46e-d901-41ce-aa9f-c4c79057ddcf",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "role": "municipal_admin",
+      "title": "New Complaint Received",
+      "message": "New HIGH complaint FIX-2026-0003 registered for PIN 273001.",
+      "type": "NEW_COMPLAINT",
+      "complaint_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "is_read": false,
+      "created_at": "2026-10-25T18:17:29.159Z"
+    },
+    {
+      "id": "64c2e684-76ea-4c15-81ce-47a4638a1e86",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "role": "citizen",
+      "title": "Complaint Registered",
+      "message": "Your grievance FIX-2026-0003 has been logged. Assigned to Gorakhpur Municipal Corporation.",
+      "type": "STATUS_CHANGE",
+      "complaint_id": "417c06a2-e88a-40e7-987a-7e6962ff23c7",
+      "is_read": false,
+      "created_at": "2026-10-25T18:17:29.156Z"
+    }
+  ]
+}

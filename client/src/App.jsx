@@ -40,6 +40,24 @@ export default function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  // Validate and synchronize session with authoritative server profile on mount
+  useEffect(() => {
+    const token = api.getToken();
+    if (token) {
+      api.getMe().then((res) => {
+        if (res.success && res.data) {
+          api.setSession(token, res.data);
+          setCurrentUser(res.data);
+        } else if (res.error?.code === 'UNAUTHORIZED' || res.error?.code === 'INVALID_TOKEN') {
+          api.clearSession();
+          setCurrentUser(null);
+        }
+      }).catch(() => {
+        // Server offline or starting up, retain session
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (currentUser) {
       fetchData();
@@ -53,8 +71,15 @@ export default function App() {
         api.getNotifications()
       ]);
 
-      if (compRes.success) setComplaints(compRes.data);
-      if (notifRes.success) setNotifications(notifRes.data);
+      if (compRes.success && Array.isArray(compRes.data)) {
+        setComplaints(compRes.data);
+      } else if (compRes.error?.code === 'UNAUTHORIZED' || compRes.error?.code === 'INVALID_TOKEN') {
+        api.clearSession();
+        setCurrentUser(null);
+      }
+      if (notifRes.success && Array.isArray(notifRes.data)) {
+        setNotifications(notifRes.data);
+      }
     } catch (e) {
       console.warn('Failed to load initial citizen data:', e);
     }

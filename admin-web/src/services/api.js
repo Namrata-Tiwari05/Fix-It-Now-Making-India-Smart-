@@ -302,5 +302,22 @@ export const adminApi = {
       body: JSON.stringify(settings)
     });
     return res.json();
+  },
+
+  async addMunicipalPincode(pincode, locality_name = '') {
+    const res = await fetch(`${API_BASE}/municipal/pincodes`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ pincode, locality_name })
+    });
+    return res.json();
+  },
+
+  async removeMunicipalPincode(pincode) {
+    const res = await fetch(`${API_BASE}/municipal/pincodes/${pincode}`, {
+      method: 'DELETE',
+      headers: this.getHeaders()
+    });
+    return res.json();
   }
 };

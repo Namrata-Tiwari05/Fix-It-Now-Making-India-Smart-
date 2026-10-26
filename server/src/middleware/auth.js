@@ -8,14 +8,17 @@ import { supabaseClient } from '../config/supabase.js';
  * or cryptographic session store, and authoritatively attaches trusted DB profile.
  * 
  * NEVER trusts frontend-supplied role or municipality headers.
+ * NEVER leaks other users' profiles via default guest fallback.
  */
 export const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     let userProfile = null;
+    let tokenProvided = false;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
+      tokenProvided = true;
 
       // 1. Supabase JWT Token
       if (token.startsWith('eyJ') && supabaseClient) {
@@ -33,6 +36,7 @@ export const authMiddleware = async (req, res, next) => {
                 is_active: true
               };
               db.profiles.push(userProfile);
+              db.persist();
             }
           }
         } catch (supabaseErr) {
@@ -56,7 +60,7 @@ export const authMiddleware = async (req, res, next) => {
         try {
           const raw = Buffer.from(token.replace('cit_', ''), 'base64').toString('utf8');
           const [userId] = raw.split(':');
-          userProfile = db.getProfileById(userId);
+          userProfile = db.getProfileById(userId) || db.getProfileByPhone(userId);
         } catch (e) {
           console.warn('[Auth Middleware] Invalid citizen session token');
         }
@@ -88,17 +92,19 @@ export const authMiddleware = async (req, res, next) => {
       return next();
     }
 
-    // Default fallback for public citizen interactions
-    const defaultCitizen = db.profiles.find(p => p.role === 'citizen') || {
-      id: '99999999-9999-9999-9999-999999999999',
-      role: 'citizen',
-      name: 'Guest Citizen',
-      email: 'citizen@fixitnow.in',
-      phone: '+919876543210'
-    };
+    // If token was provided but could not be validated
+    if (tokenProvided) {
+      return res.status(401).json({
+        success: false,
+        error: { code: 'INVALID_TOKEN', message: 'Session expired or invalid. Please login again.' }
+      });
+    }
 
-    req.user = defaultCitizen;
-    next();
+    // If no token was provided at all
+    return res.status(401).json({
+      success: false,
+      error: { code: 'UNAUTHORIZED', message: 'Authentication required. Please login.' }
+    });
   } catch (error) {
     console.error('[Auth Middleware Error]', error);
     next(error);
