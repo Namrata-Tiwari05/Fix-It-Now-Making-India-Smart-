@@ -253,12 +253,14 @@ def run_yolo_detection(image: Image.Image, conf_threshold: float = 0.14) -> Dict
                     has_full_frame_anchor = True
                     break
 
-        # Disambiguation Pass: ONLY run high resolution if 640px returned an ambiguous full-frame anchor
+        # Disambiguation Pass: NEVER exceed 640px to protect Render cloud memory limit
         if has_full_frame_anchor:
             max_dim = max(img_w, img_h)
             if max_dim >= 800:
-                native_imgsz = min(1280, max_dim)
-                native_res = model.predict(source=image, imgsz=native_imgsz, conf=max(0.13, conf_threshold - 0.02), verbose=False)
+                native_imgsz = min(640, max_dim)
+                with torch.no_grad():
+                    native_res = model.predict(source=image, imgsz=native_imgsz, conf=max(0.13, conf_threshold - 0.02), verbose=False)
+                gc.collect()
                 valid_native_boxes = []
                 for nb in native_res[0].boxes:
                     n_xyxy = nb.xyxy[0].tolist()
@@ -266,9 +268,10 @@ def run_yolo_detection(image: Image.Image, conf_threshold: float = 0.14) -> Dict
                     if n_ratio <= 0.75:
                         valid_native_boxes.append(nb)
                 if valid_native_boxes:
-                    logger.info(f"Native scale inference resolved localized defect at imgsz={native_imgsz}.")
+                    logger.info(f"Disambiguation inference resolved localized defect at imgsz={native_imgsz}.")
                     results = native_res
         infer_ms = round((time.perf_counter() - start_t) * 1000, 2)
+        gc.collect()
     except Exception as e:
         logger.error(f"YOLO inference failed: {e}")
         return {

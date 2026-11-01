@@ -12,6 +12,61 @@ export const CIVIC_CATEGORIES = [
   'Encroachment & Public Space'
 ];
 
+let lastWorkingAiUrl = null;
+
+async function callAiMicroservice(endpoint, payload, timeoutMs = 45000) {
+  const configured = (config.aiServiceUrl || '').trim();
+  const internalDefault = 'http://127.0.0.1:8000';
+  const localhostDefault = 'http://localhost:8000';
+
+  const candidates = [];
+  if (lastWorkingAiUrl) {
+    candidates.push(lastWorkingAiUrl);
+  }
+  if (configured && !candidates.includes(configured)) {
+    candidates.push(configured);
+  }
+  if (!candidates.includes(internalDefault)) {
+    candidates.push(internalDefault);
+  }
+  if (!candidates.includes(localhostDefault)) {
+    candidates.push(localhostDefault);
+  }
+
+  for (const base of candidates) {
+    const cleanBase = base.replace(/\/+$/, '');
+    const isTunnel = cleanBase.includes('trycloudflare.com') || cleanBase.includes('loca.lt') || cleanBase.includes('ngrok');
+    
+    // Fail-fast for tunnels that might be disconnected so we don't stall the citizen
+    const currentTimeout = isTunnel ? Math.min(timeoutMs, 4500) : timeoutMs;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), currentTimeout);
+
+    try {
+      const response = await fetch(`${cleanBase}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        lastWorkingAiUrl = cleanBase;
+        return await response.json();
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.warn(`[AI Orchestrator] AI service at ${cleanBase}${endpoint} unavailable (${err.message}). Trying fallback endpoint...`);
+      if (lastWorkingAiUrl === cleanBase) {
+        lastWorkingAiUrl = null;
+      }
+    }
+  }
+
+  return null;
+}
+
 export const aiOrchestrator = {
   /**
    * Module 1: Citizen Image-Description Validation
