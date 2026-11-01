@@ -24,7 +24,7 @@ export const aiOrchestrator = {
     if (config.aiServiceUrl) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
 
         const response = await fetch(`${config.aiServiceUrl}/api/validate-submission`, {
           method: 'POST',
@@ -52,11 +52,13 @@ export const aiOrchestrator = {
             priorityReason: valData.priority_reason,
             safetyOverrideTriggered: valData.safety_override_triggered,
             modelIdentifier: valData.model_identifier,
+            caseId: valData.case_id,
             isFlagged: Boolean(valData.is_flagged),
             flagReason: valData.flag_reason,
             visualConfidence: valData.visual_confidence || 0.0,
             textConfidence: valData.text_confidence || 0.0,
             detections: valData.detections || [],
+            annotatedImage: valData.annotated_image || null,
             source: 'fastapi_ml_validator'
           };
         }

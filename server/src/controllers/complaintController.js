@@ -27,8 +27,31 @@ export const complaintController = {
       // 2. Cross-modal validation (Module 1)
       const validation = await aiOrchestrator.validateCitizenSubmission({ description, pincode, lat, lng, media });
 
-      // 3. AI Triage analysis
-      const aiAnalysis = await aiOrchestrator.analyzeComplaint({ description, pincode, lat, lng, media });
+      // 3. AI Triage analysis (reuse validation if already completed by FastAPI ML to avoid duplicate heavy YOLO inference)
+      let aiAnalysis;
+      if (validation.source === 'fastapi_ml_validator') {
+        aiAnalysis = {
+          category: validation.category,
+          primary_category: validation.category,
+          confidence: validation.categoryConfidence,
+          priority: validation.priority,
+          risk_score: validation.riskScore,
+          priority_confidence: validation.priorityConfidence,
+          priority_reason: validation.priorityReason,
+          safety_override_triggered: validation.safetyOverrideTriggered,
+          model_identifier: validation.modelIdentifier,
+          validation_status: validation.validationStatus,
+          is_valid: validation.isValid,
+          validation_reason: validation.reason,
+          detections: validation.detections,
+          annotated_image: validation.annotatedImage,
+          is_flagged: validation.isFlagged,
+          flag_reason: validation.flagReason,
+          source: 'fastapi_ml_validator'
+        };
+      } else {
+        aiAnalysis = await aiOrchestrator.analyzeComplaint({ description, pincode, lat, lng, media });
+      }
 
       const hasMedia = media && Array.isArray(media) && media.length > 0;
       const isInvalidDesc = validation.validationStatus === 'INVALID_DESCRIPTION';
