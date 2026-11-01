@@ -41,7 +41,7 @@ app.use(cors({
     if (customOrigins.includes(origin) || /\.vercel\.app$/.test(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
       return callback(null, true);
     }
-    return callback(new Error(Origin  not permitted by CORS policy));
+    return callback(new Error('Origin not permitted by CORS policy: ' + origin));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
