@@ -591,18 +591,17 @@ export const complaintController = {
         return errorResponse(res, 'Please provide an image file.', 'MISSING_FILE', 400);
       }
       let storageUrl = null;
+      const fileExt = path.extname(req.file.originalname) || '.jpg';
+      const cleanFilename = `evidence-${Date.now()}-${uuidv4().slice(0, 8)}${fileExt}`;
+      const fileBuffer = req.file.buffer || (req.file.path ? fs.readFileSync(req.file.path) : null);
 
-      // 1. Supabase Storage if bucket is reachable
-      if (supabaseAdminClient) {
+      // 1. Supabase Storage
+      if (supabaseAdminClient && fileBuffer) {
         try {
-          const fileExt = path.extname(req.file.originalname) || '.jpg';
-          const storagePath = `complaints/evidence-${Date.now()}-${uuidv4().slice(0, 8)}${fileExt}`;
-          const fileBuffer = fs.readFileSync(req.file.path);
-
           const { data, error } = await supabaseAdminClient.storage
             .from('complaints')
-            .upload(storagePath, fileBuffer, {
-              contentType: req.file.mimetype,
+            .upload(cleanFilename, fileBuffer, {
+              contentType: req.file.mimetype || 'image/jpeg',
               upsert: true
             });
 
@@ -611,24 +610,27 @@ export const complaintController = {
               .from('complaints')
               .getPublicUrl(data.path);
             storageUrl = publicUrlData?.publicUrl;
+          } else if (error) {
+            console.warn('[Complaint Media Upload] Supabase upload error:', error.message);
           }
         } catch (supabaseErr) {
           console.warn('[Complaint Media Upload] Supabase Storage upload skipped/failed:', supabaseErr.message);
         }
       }
 
-      // 2. High-availability local persistent URL fallback (strictly for offline local development)
+      // 2. High-availability local persistent URL fallback
       if (!storageUrl) {
-        if (process.env.NODE_ENV === 'production') {
+        if (req.file.path) {
+          const baseUrl = `${req.protocol}://${req.get('host')}`;
+          storageUrl = `${baseUrl}/uploads/complaints/${path.basename(req.file.path)}`;
+        } else if (process.env.NODE_ENV === 'production') {
           return errorResponse(res, 'Failed to store image in cloud storage. Please ensure Supabase Storage is reachable.', 'STORAGE_ERROR', 500);
         }
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        storageUrl = `${baseUrl}/uploads/complaints/${req.file.filename}`;
       }
 
       return successResponse(res, {
         mediaUrl: storageUrl,
-        filename: req.file.filename,
+        filename: cleanFilename,
         mimetype: req.file.mimetype,
         size: req.file.size
       }, 'Evidence image stored successfully');

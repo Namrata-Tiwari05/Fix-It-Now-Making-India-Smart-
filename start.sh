@@ -25,6 +25,6 @@ done
 
 echo "2. Starting Node.js Express API Server on 0.0.0.0:${PORT}..."
 cd /app/server
-export AI_SERVICE_URL="http://127.0.0.1:${AI_PORT}"
+export AI_SERVICE_URL="${AI_SERVICE_URL:-http://127.0.0.1:${AI_PORT}}"
 exec node src/index.js
 
