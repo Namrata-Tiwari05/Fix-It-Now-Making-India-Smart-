@@ -120,6 +120,7 @@ export default function App() {
                 <MunicipalOverview
                   onSelectComplaint={setSelectedComplaintId}
                   currentRole={currentUser.role}
+                  onLogout={handleLogout}
                 />
               )}
               {activeSection === 'complaints' && (

@@ -1,0 +1,34 @@
+{
+  "calibrated_thresholds": {
+    "tau_clip_match": 0.16,
+    "tau_clip_mismatch": 0.14,
+    "tau_yolo_conf": 0.3
+  },
+  "category_mapping": {
+    "pothole": "Roads & Potholes",
+    "road_crack": "Roads & Potholes",
+    "surface_erosion": "Roads & Potholes",
+    "garbage_litter": "Solid Waste & Sanitation",
+    "stagnant_water": "Drainage & Sewerage",
+    "open_manhole": "Drainage & Sewerage",
+    "fault_streetlight": "Street Lighting"
+  },
+  "canonical_anchors": {
+    "pothole": "a deep dangerous pothole cavity crater in asphalt road pavement",
+    "road_crack": "a long structural crack and fracture line running across road",
+    "surface_erosion": "eroded peeled road surface with rough loose aggregate and gravel",
+    "garbage_litter": "a large pile of overflowing garbage litter and plastic waste on street",
+    "stagnant_water": "a pool of filthy stagnant waterlogged sewage on the road",
+    "open_manhole": "an uncovered open sewer manhole chamber without lid on street",
+    "fault_streetlight": "a broken damaged street light luminaire unlit on lamppost"
+  },
+  "calibration_dataset_size": 14,
+  "held_out_test_size": 14,
+  "supported_statuses": [
+    "MATCH",
+    "PARTIAL_MATCH",
+    "MISMATCH",
+    "AMBIGUOUS",
+    "INSUFFICIENT_EVIDENCE"
+  ]
+}

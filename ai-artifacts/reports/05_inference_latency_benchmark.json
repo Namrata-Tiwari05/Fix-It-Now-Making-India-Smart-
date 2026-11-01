@@ -1,0 +1,14 @@
+{
+  "device": "NVIDIA GeForce RTX 2050",
+  "cuda_available": true,
+  "iterations": 50,
+  "input_resolution": "640x640",
+  "mean_latency_ms": 28.22,
+  "std_latency_ms": 9.25,
+  "p50_latency_ms": 23.76,
+  "p95_latency_ms": 45.98,
+  "p99_latency_ms": 50.16,
+  "min_latency_ms": 18.76,
+  "max_latency_ms": 50.36,
+  "throughput_fps": 35.4
+}

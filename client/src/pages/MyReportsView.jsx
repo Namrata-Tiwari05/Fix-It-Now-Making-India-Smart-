@@ -9,10 +9,11 @@ export const MyReportsView = ({ complaints = [], onSelectComplaint, onOpenReport
 
   const filtered = complaints.filter(c => {
     // Filter tab
+    const isMergedActive = Boolean(c.duplicate_of || c.is_merged_duplicate) && (!c.master_summary || !['RESOLVED', 'CLOSED'].includes(c.master_summary.status));
     if (activeFilter === 'ACTIVE') {
-      if (['RESOLVED', 'CLOSED', 'REJECTED'].includes(c.status)) return false;
+      if (['RESOLVED', 'CLOSED', 'REJECTED'].includes(c.status) && !isMergedActive) return false;
     } else if (activeFilter === 'RESOLVED') {
-      if (!['RESOLVED', 'CLOSED'].includes(c.status)) return false;
+      if (!['RESOLVED'].includes(c.status) && (c.status !== 'CLOSED' || isMergedActive)) return false;
     }
 
     // Search query
@@ -137,7 +138,7 @@ export const MyReportsView = ({ complaints = [], onSelectComplaint, onOpenReport
                 <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#D4FF00', letterSpacing: '0.04em' }}>
                   {c.complaint_number}
                 </span>
-                <StatusBadge status={c.status} />
+                <StatusBadge status={(c.is_merged_duplicate || c.duplicate_of) ? 'MERGED_DUPLICATE' : c.status} />
               </div>
 
               <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#F8FAFC', lineHeight: 1.3 }}>
@@ -147,6 +148,12 @@ export const MyReportsView = ({ complaints = [], onSelectComplaint, onOpenReport
               <p style={{ fontSize: '0.8rem', color: '#94A3B8', marginTop: '0.35rem', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                 {c.description}
               </p>
+
+              {(c.is_merged_duplicate || c.duplicate_of) && (
+                <div style={{ marginTop: '0.45rem', fontSize: '0.72rem', color: '#F59E0B', fontWeight: 600 }}>
+                  🔗 Consolidated with Master #{c.master_summary?.complaint_number || 'Parent Ticket'} ({c.master_summary?.status || 'In Progress'})
+                </div>
+              )}
 
               <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.06)', margin: '0.75rem 0' }} />
 

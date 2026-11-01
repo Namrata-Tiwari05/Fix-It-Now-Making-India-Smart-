@@ -15,7 +15,7 @@ export const complaintController = {
    */
   async preAnalyze(req, res, next) {
     try {
-      const { description, pincode, lat, lng, media } = req.body;
+      const { description, pincode, lat, lng, media = [] } = req.body;
 
       if (!description) {
         return errorResponse(res, 'Description is required for AI analysis.', 'INVALID_INPUT', 400);
@@ -24,12 +24,80 @@ export const complaintController = {
       // 1. PIN routing lookup
       const pinResolution = pincodeRoutingService.resolveMunicipality(pincode);
 
-      // 2. AI Triage analysis
+      // 2. Cross-modal validation (Module 1)
+      const validation = await aiOrchestrator.validateCitizenSubmission({ description, pincode, lat, lng, media });
+
+      // 3. AI Triage analysis
       const aiAnalysis = await aiOrchestrator.analyzeComplaint({ description, pincode, lat, lng, media });
+
+      const hasMedia = media && Array.isArray(media) && media.length > 0;
+      const isInvalidDesc = validation.validationStatus === 'INVALID_DESCRIPTION';
+      const isBlocked = isInvalidDesc || (hasMedia && !validation.isValid);
+      const isMismatch = isBlocked && (validation.validationStatus === 'DETECTED_BUT_MISMATCHED' || validation.validationStatus === 'IMAGE_DESCRIPTION_MISMATCH' || validation.validationStatus === 'MISMATCH');
+      const isNonCivic = isBlocked && (validation.validationStatus === 'INVALID_IMAGE' || validation.validationStatus === 'NON_CIVIC_IMAGE');
+      const isUncertain = isBlocked && (validation.validationStatus === 'NO_RELIABLE_DETECTION' || validation.validationStatus === 'INSUFFICIENT_EVIDENCE');
+
+      // Extract detected visual defect and category from YOLO
+      const visualDetections = aiAnalysis.detections || [];
+      const hasDetections = visualDetections.length > 0;
+      const topVisualDefect = hasDetections ? visualDetections[0].class_name : null;
+      const topVisualCategory = hasDetections ? visualDetections[0].category : null;
+
+      let displayCategory = aiAnalysis.category;
+      let displayPriority = aiAnalysis.priority;
+      let displayRiskScore = aiAnalysis.risk_score;
+
+      if (isInvalidDesc || isNonCivic) {
+        displayCategory = 'Other / Non-Civic Issue';
+        displayPriority = 'LOW';
+        displayRiskScore = 0;
+      } else if (isMismatch) {
+        // When mismatch occurs, display the detected visual category from the photo so user clearly sees what YOLO detected!
+        displayCategory = topVisualCategory || aiAnalysis.category;
+        displayPriority = aiAnalysis.priority || 'MEDIUM';
+        displayRiskScore = aiAnalysis.risk_score || 45;
+      } else if (isUncertain) {
+        // Genuine outdoor scene without high-confidence automated box; keep text-inferred civic category
+        displayCategory = (validation.category && validation.category !== 'Other / Non-Civic Issue') ? validation.category : (aiAnalysis.category || 'Roads & Potholes');
+        displayPriority = aiAnalysis.priority || 'MEDIUM';
+        displayRiskScore = aiAnalysis.risk_score || 35;
+      }
+
+      const isLowConfVisual = hasDetections && visualDetections[0].confidence < 0.45;
+      const isUnverified = !validation.isValid || isMismatch || isNonCivic || Boolean(aiAnalysis.is_flagged) || Boolean(validation.isFlagged) || (validation.validationStatus === 'NEEDS_MANUAL_REVIEW') || isLowConfVisual;
 
       return successResponse(res, {
         pin_resolution: pinResolution,
-        ai_recommendation: aiAnalysis
+        ai_recommendation: {
+          ...aiAnalysis,
+          category: displayCategory,
+          priority: displayPriority,
+          risk_score: displayRiskScore,
+          confidence: isNonCivic ? 0.10 : (isMismatch ? 0.35 : Math.min(0.88, aiAnalysis.confidence)),
+          visual_confidence: hasDetections ? visualDetections[0].confidence : null,
+          text_confidence: validation.textConfidence || null,
+          is_flagged: isUnverified,
+          flag_reason: (!validation.isValid || isMismatch) ? validation.reason : (isLowConfVisual ? `Low confidence detection (${Math.round(visualDetections[0].confidence * 100)}%). Requires manual engineer inspection.` : aiAnalysis.flag_reason),
+          is_valid: validation.isValid,
+          validation_status: validation.validationStatus || aiAnalysis.validation_status,
+          case_id: validation.caseId,
+          mismatch_reason: validation.reason,
+          mismatch_reasons: validation.mismatchReasons,
+          detections: isNonCivic ? [] : visualDetections,
+          annotated_image: isNonCivic ? null : (aiAnalysis.annotated_image || null),
+          visual_defect: topVisualDefect,
+          visual_category: topVisualCategory,
+          text_category: validation.textClassification?.municipal_department || null,
+          hybrid_match: {
+            status: validation.validationStatus || (validation.isValid 
+              ? (hasDetections ? (isLowConfVisual ? 'NEEDS_MANUAL_REVIEW' : 'DETECTED_AND_MATCHED') : 'NO_RELIABLE_DETECTION')
+              : (isMismatch ? 'DETECTED_BUT_MISMATCHED' : 'INVALID_IMAGE')),
+            validation_status: validation.validationStatus || aiAnalysis.validation_status,
+            is_valid: validation.isValid,
+            reason: validation.reason,
+            reasons: validation.mismatchReasons
+          }
+        }
       }, 'Draft analysis complete');
     } catch (err) {
       next(err);
@@ -49,12 +117,30 @@ export const complaintController = {
         lat,
         lng,
         category, // citizen confirmed category
-        priority, // citizen confirmed or AI recommended
+        priority, // ignored: citizen cannot override AI priority
         media = []
       } = req.body;
 
       if (!description || !pincode) {
         return errorResponse(res, 'Description and Problem Location PIN Code are required.', 'MISSING_FIELDS', 400);
+      }
+
+      // 1. Module 1: Strict Image-Description & Civic Intent Validation Enforcement (Backend cannot be bypassed)
+      const validation = await aiOrchestrator.validateCitizenSubmission({ description, pincode, lat, lng, media });
+      if (!validation.isValid) {
+        if (['INVALID_DESCRIPTION', 'INVALID_IMAGE', 'DETECTED_BUT_MISMATCHED', 'IMAGE_DESCRIPTION_MISMATCH'].includes(validation.validationStatus)) {
+          return errorResponse(
+            res,
+            validation.reason || 'The complaint description or uploaded evidence is invalid.',
+            validation.validationStatus,
+            400,
+            {
+              validation_status: validation.validationStatus,
+              mismatch_reason: validation.reason,
+              mismatch_reasons: validation.mismatchReasons
+            }
+          );
+        }
       }
 
       // Server-side authoritative PIN lookup (never trust client municipality)
@@ -63,8 +149,9 @@ export const complaintController = {
       // AI Analysis
       const aiResult = await aiOrchestrator.analyzeComplaint({ description, pincode, lat, lng, media });
 
+      // Module 3: Priority is generated authoritatively by the backend. Citizen cannot change priority!
       const finalCategory = category || aiResult.category || 'Roads & Potholes';
-      const finalPriority = priority || aiResult.priority || 'MEDIUM';
+      const finalPriority = aiResult.priority || 'MEDIUM';
       const dueDate = slaService.calculateDueDate(finalPriority);
 
       const userPhone = normalizePhone(req.user.phone || req.body.citizen_phone);
@@ -85,11 +172,18 @@ export const complaintController = {
         category: finalCategory,
         priority: finalPriority,
         priority_reason: aiResult.priority_reason,
+        risk_score: aiResult.risk_score || 50,
+        risk_factors: aiResult.risk_factors || {},
+        contributing_factors: aiResult.contributing_factors || {},
+        safety_override_triggered: aiResult.safety_override_triggered || null,
+        safety_override_status: aiResult.safety_override_status || (aiResult.safety_override_triggered ? 'Applied' : 'None'),
+        validation_status: aiResult.validation_status || 'MATCHED',
         description,
         is_routing_review: routing.is_routing_review,
         ai_status: aiResult.ai_status,
         due_at: dueDate,
-        media: media.map(m => typeof m === 'string' ? { storage_path: m, type: 'image' } : m)
+        media: media.map(m => typeof m === 'string' ? { storage_path: m, type: 'image' } : m),
+        ai_detections: aiResult.detections || []
       };
 
       const complaint = await db.createComplaint(complaintData);
@@ -103,15 +197,14 @@ export const complaintController = {
         duplicate_score: aiResult.duplicate_candidates?.[0]?.similarity_score || 0.1,
         priority: aiResult.priority,
         extracted_data: aiResult.extracted_data,
+        detections: aiResult.detections || [],
         reasoning: aiResult.priority_reason,
         model_version: aiResult.model_version,
         created_at: new Date().toISOString()
       };
       db.ai_analyses.push(aiRecord);
       if (supabaseAdminClient) {
-        supabaseAdminClient.from('ai_analyses').insert(aiRecord).then(() => {}, (err) => {
-          console.warn('[ComplaintController] Error saving AI analysis to Supabase:', err);
-        });
+        try { await supabaseAdminClient.from('ai_analyses').insert(aiRecord); } catch(err) { console.warn('[ComplaintController] Error saving AI analysis to Supabase:', err); }
       }
 
       // Store duplicate candidates if any
@@ -194,19 +287,150 @@ export const complaintController = {
 
       // Citizen can only see their own complaints
       if (req.user.role === 'citizen' && complaint.citizen_id !== req.user.id) {
-        // Allow public tracking summary or restrict
+        return errorResponse(res, "Access denied: You are not authorized to view another citizen's grievance details.", 'FORBIDDEN', 403);
       }
 
       const auditHistory = db.getAuditLogs(complaint.id);
       const aiAnalysis = db.ai_analyses.find(a => a.complaint_id === complaint.id);
-      const duplicates = db.complaint_duplicates.filter(d => d.complaint_id === complaint.id);
+      // Only consider duplicates that have not been explicitly dismissed or unlinked
+      const duplicates = (db.complaint_duplicates || []).filter(d =>
+        d.complaint_id === complaint.id &&
+        !['unlinked', 'kept_separate', 'rejected'].includes(d.decision)
+      );
       const slaMetrics = slaService.getSlaMetrics(complaint);
+
+      // Compute dynamic candidates passing all strict domain & content gates
+      const dynamicCandidates = aiOrchestrator.findLocalDuplicateCandidates({
+        description: complaint.description,
+        pincode: complaint.pincode,
+        lat: complaint.lat,
+        lng: complaint.lng,
+        category: complaint.category,
+        created_at: complaint.created_at
+      });
+
+      // Enrich duplicate candidates; drop any that fail category or defect content gates unless already linked
+      const enrichedDuplicates = [];
+
+      for (const d of duplicates) {
+        const candidate = db.getComplaintById(d.candidate_id);
+        const isLinked = (complaint.duplicate_of === d.candidate_id || complaint.merged_into === d.candidate_id);
+        const dynamicMatch = dynamicCandidates.find(dc => dc.candidate_id === d.candidate_id);
+
+        // If not actively linked and not matching dynamic multi-factor gates, skip legacy candidate
+        if (!isLinked && !dynamicMatch) {
+          continue;
+        }
+
+        enrichedDuplicates.push({
+          ...d,
+          complaint_number: candidate?.complaint_number || ('Ticket #' + d.candidate_id.slice(0, 8)),
+          category: candidate?.category || 'Civic Issue',
+          description: candidate?.description || '',
+          status: candidate?.status || 'UNKNOWN',
+          address: candidate?.address || candidate?.landmark || 'Same Vicinity',
+          created_at: candidate?.created_at || null,
+          is_currently_linked: isLinked,
+          similarity_score: dynamicMatch?.similarity_score || d.score || 0.85,
+          decision: dynamicMatch?.decision || d.decision || 'DUPLICATE',
+          reasons: dynamicMatch?.reasons || [
+            'Proximity within the same neighborhood.',
+            'Related civic defect category.'
+          ],
+          breakdown: dynamicMatch?.breakdown || {
+            distance_meters: null,
+            distance_label: 'Same Vicinity',
+            time_delta_hours: null,
+            time_delta_label: 'Recent Incident',
+            category_match: candidate?.category === complaint.category,
+            category_label: candidate?.category === complaint.category ? `Matching Category (${complaint.category})` : 'Related Category',
+            text_similarity_percent: Math.round((d.score || 0.8) * 100),
+            text_label: 'Lexical / Context Match'
+          }
+        });
+      }
+
+      // Add high-confidence dynamic candidates if not already present or dismissed
+      for (const live of dynamicCandidates) {
+        const isDismissed = (db.complaint_duplicates || []).some(cd =>
+          cd.complaint_id === complaint.id &&
+          cd.candidate_id === live.candidate_id &&
+          ['unlinked', 'kept_separate', 'rejected'].includes(cd.decision)
+        );
+
+        if (
+          live.candidate_id !== complaint.id &&
+          !isDismissed &&
+          !enrichedDuplicates.some(e => e.candidate_id === live.candidate_id)
+        ) {
+          enrichedDuplicates.push({
+            id: `${complaint.id}-${live.candidate_id}`,
+            complaint_id: complaint.id,
+            candidate_id: live.candidate_id,
+            complaint_number: live.complaint_number,
+            category: live.category,
+            description: live.description,
+            address: live.address,
+            status: live.status,
+            created_at: live.created_at,
+            is_currently_linked: (complaint.duplicate_of === live.candidate_id || complaint.merged_into === live.candidate_id),
+            similarity_score: live.similarity_score,
+            decision: live.decision,
+            reasons: live.reasons,
+            breakdown: live.breakdown
+          });
+        }
+      }
+
+      let linkedMasterComplaint = null;
+      const masterId = complaint.duplicate_of || complaint.merged_into;
+      if (masterId) {
+        const master = db.getComplaintById(masterId);
+        if (master) {
+          linkedMasterComplaint = {
+            id: master.id,
+            complaint_number: master.complaint_number,
+            category: master.category,
+            description: master.description,
+            status: master.status,
+            department_name: master.department_name,
+            assigned_officer_name: master.assigned_officer_name,
+            due_at: master.due_at,
+            sla_metrics: slaService.getSlaMetrics(master),
+            resolution: master.resolution || null,
+            resolution_evidence: master.resolution_evidence || [],
+            media: master.media || [],
+            created_at: master.created_at,
+            address: master.address || master.landmark
+          };
+        }
+      }
+
+      const resolvedRiskScore = complaint.risk_score || aiAnalysis?.risk_score || (complaint.priority === 'CRITICAL' ? 88 : complaint.priority === 'HIGH' ? 68 : complaint.priority === 'MEDIUM' ? 45 : 25);
+      const resolvedConfidence = complaint.confidence || aiAnalysis?.confidence || 0.94;
+      const resolvedFactors = complaint.risk_factors || aiAnalysis?.risk_factors || null;
+      const resolvedOverride = complaint.safety_override_triggered || aiAnalysis?.safety_override || null;
+      const resolvedSlaHours = complaint.recommended_sla_hours || aiAnalysis?.recommended_sla_hours || 48;
 
       return successResponse(res, {
         ...complaint,
+        risk_score: resolvedRiskScore,
+        confidence: resolvedConfidence,
+        risk_factors: resolvedFactors,
+        safety_override_triggered: resolvedOverride,
+        recommended_sla_hours: resolvedSlaHours,
         sla_metrics: slaMetrics,
-        ai_analysis: aiAnalysis || null,
-        duplicate_candidates: duplicates,
+        ai_analysis: aiAnalysis ? {
+          ...aiAnalysis,
+          risk_score: resolvedRiskScore,
+          confidence: resolvedConfidence,
+          risk_factors: resolvedFactors,
+          safety_override: resolvedOverride
+        } : null,
+        duplicate_candidates: enrichedDuplicates,
+        linked_master_complaint: linkedMasterComplaint,
+        merged_complaints: complaint.merged_complaints || [],
+        merged_count: complaint.merged_count || 1,
         audit_history: auditHistory
       });
     } catch (err) {
@@ -224,10 +448,26 @@ export const complaintController = {
         citizen_id: req.user.id,
         citizen_phone: userPhone
       });
-      const enriched = list.map(c => ({
-        ...c,
-        sla_metrics: slaService.getSlaMetrics(c)
-      }));
+      const enriched = list.map(c => {
+        let masterSummary = null;
+        const masterId = c.duplicate_of || c.merged_into;
+        if (masterId) {
+          const master = db.getComplaintById(masterId);
+          if (master) {
+            masterSummary = {
+              complaint_number: master.complaint_number,
+              status: master.status,
+              assigned_officer_name: master.assigned_officer_name
+            };
+          }
+        }
+        return {
+          ...c,
+          sla_metrics: slaService.getSlaMetrics(c),
+          master_summary: masterSummary,
+          is_merged_duplicate: Boolean(masterId)
+        };
+      });
       return successResponse(res, enriched);
     } catch (err) {
       next(err);
@@ -336,8 +576,11 @@ export const complaintController = {
         }
       }
 
-      // 2. High-availability local persistent URL fallback
+      // 2. High-availability local persistent URL fallback (strictly for offline local development)
       if (!storageUrl) {
+        if (process.env.NODE_ENV === 'production') {
+          return errorResponse(res, 'Failed to store image in cloud storage. Please ensure Supabase Storage is reachable.', 'STORAGE_ERROR', 500);
+        }
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         storageUrl = `${baseUrl}/uploads/complaints/${req.file.filename}`;
       }

@@ -44,7 +44,7 @@ export const BottomNav = ({ activeTab, onSelectTab, onOpenReport, unreadCount = 
           }}
         >
           <Home size={20} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
-          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'home' ? 600 : 500 }}>Home</span>
+          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'home' ? 700 : 500 }}>Home</span>
         </button>
 
         {/* My Reports */}
@@ -64,7 +64,7 @@ export const BottomNav = ({ activeTab, onSelectTab, onOpenReport, unreadCount = 
           }}
         >
           <ClipboardList size={20} strokeWidth={activeTab === 'reports' ? 2.5 : 2} />
-          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'reports' ? 600 : 500 }}>Reports</span>
+          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'reports' ? 700 : 500 }}>Reports</span>
         </button>
 
         {/* Central Floating Lime Report Issue Button */}
@@ -76,14 +76,14 @@ export const BottomNav = ({ activeTab, onSelectTab, onOpenReport, unreadCount = 
               width: '54px',
               height: '54px',
               borderRadius: '50%',
-              backgroundColor: 'var(--accent-lime, #D4FF00)',
-              color: '#0B0F12',
+              backgroundColor: 'var(--hero-btn-bg, #D4FF00)',
+              color: 'var(--hero-btn-text, #0B0F12)',
               border: '4px solid var(--bg-primary, #0B0F12)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: '0 8px 24px rgba(212, 255, 0, 0.4)',
+              boxShadow: 'var(--hero-btn-shadow, 0 8px 24px rgba(212, 255, 0, 0.4))',
               transition: 'transform 0.15s ease'
             }}
             onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.92)')}
@@ -111,7 +111,7 @@ export const BottomNav = ({ activeTab, onSelectTab, onOpenReport, unreadCount = 
           }}
         >
           <MapPin size={20} strokeWidth={activeTab === 'map' ? 2.5 : 2} />
-          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'map' ? 600 : 500 }}>City Map</span>
+          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'map' ? 700 : 500 }}>City Map</span>
         </button>
 
         {/* Notifications / Alerts */}
@@ -148,7 +148,7 @@ export const BottomNav = ({ activeTab, onSelectTab, onOpenReport, unreadCount = 
               />
             )}
           </div>
-          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'notifications' ? 600 : 500 }}>Alerts</span>
+          <span style={{ fontSize: '0.68rem', fontWeight: activeTab === 'notifications' ? 700 : 500 }}>Alerts</span>
         </button>
       </div>
     </nav>

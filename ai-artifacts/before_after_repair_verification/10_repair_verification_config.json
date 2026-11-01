@@ -1,0 +1,12 @@
+{
+  "blur_min_laplacian_var": 50.0,
+  "brightness_min": 35.0,
+  "brightness_max": 230.0,
+  "min_resolution_px": 100,
+  "yolo_conf_threshold": 0.25,
+  "defect_persistence_threshold": 0.35,
+  "dhash_identical_max_dist": 5,
+  "visual_scene_min_sim": 0.4,
+  "gps_match_max_meters": 35.0,
+  "gps_warning_max_meters": 75.0
+}

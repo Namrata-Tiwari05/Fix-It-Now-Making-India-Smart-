@@ -1,6 +1,7 @@
 import { db } from '../services/db/index.js';
 import { complaintLifecycleService } from '../services/complaints/complaintLifecycle.js';
 import { slaService } from '../services/sla/slaService.js';
+import { aiOrchestrator } from '../services/ai/aiOrchestrator.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
 export const municipalController = {
@@ -71,10 +72,18 @@ export const municipalController = {
         search
       });
 
-      const enriched = list.map(c => ({
-        ...c,
-        sla_metrics: slaService.getSlaMetrics(c)
-      }));
+      const enriched = list.map(c => {
+        const ai = (db.ai_analyses || []).find(a => a.complaint_id === c.id);
+        return {
+          ...c,
+          risk_score: c.risk_score || ai?.risk_score || (c.priority === 'CRITICAL' ? 88 : c.priority === 'HIGH' ? 68 : c.priority === 'MEDIUM' ? 45 : 25),
+          confidence: c.confidence || ai?.confidence || 0.94,
+          risk_factors: c.risk_factors || ai?.risk_factors || null,
+          safety_override_triggered: c.safety_override_triggered || ai?.safety_override || null,
+          recommended_sla_hours: c.recommended_sla_hours || ai?.recommended_sla_hours || 48,
+          sla_metrics: slaService.getSlaMetrics(c)
+        };
+      });
 
       return successResponse(res, enriched);
     } catch (err) {
@@ -107,8 +116,8 @@ export const municipalController = {
 
       const updated = await db.updateComplaint(id, updates);
 
-      // Add assignment record
-      db.assignments.push({
+      // Add assignment record authoritatively
+      await db.createAssignment({
         id: `asg-${Date.now()}`,
         complaint_id: id,
         department_id: updates.department_id,
@@ -215,27 +224,141 @@ export const municipalController = {
   },
 
   /**
-   * Link complaint as duplicate or keep separate
+   * Merge or link complaint as duplicate, or separate/unlink tickets
    */
   async linkDuplicate(req, res, next) {
     try {
       const { id } = req.params;
-      const { candidate_id, decision, reason } = req.body; // decision: 'linked' or 'kept_separate'
+      const { candidate_id, decision, reason } = req.body; // decision: 'merged', 'linked', 'kept_separate', 'unlinked'
 
-      const record = db.complaint_duplicates.find(d => d.complaint_id === id && d.candidate_id === candidate_id);
+      const child = db.getComplaintById(id);
+      if (!child) return errorResponse(res, 'Child complaint not found', 'NOT_FOUND', 404);
+
+      const parent = candidate_id ? db.getComplaintById(candidate_id) : null;
+
+      // Update or create duplicate record in DB
+      let record = db.complaint_duplicates.find(d => d.complaint_id === id && d.candidate_id === candidate_id);
       if (record) {
         record.decision = decision;
         record.decision_by = req.user.id;
         record.decision_reason = reason;
+      } else if (candidate_id) {
+        record = {
+          id: `${id}-${candidate_id}`,
+          complaint_id: id,
+          candidate_id,
+          score: 0.90,
+          decision,
+          decision_by: req.user.id,
+          decision_reason: reason
+        };
+        db.complaint_duplicates.push(record);
       }
 
-      if (decision === 'linked') {
-        db.updateComplaint(id, {
+      const isMergeAction = decision === 'merged' || decision === 'linked';
+
+      if (isMergeAction) {
+        // 1. Update Child Complaint: Closed as Duplicate & points to parent
+        await db.updateComplaint(id, {
           status: 'CLOSED',
-          duplicate_of: candidate_id
+          duplicate_of: candidate_id,
+          merged_into: candidate_id,
+          merged_at: new Date().toISOString(),
+          merge_reason: reason || 'Merged into parent ticket by Municipal Administrator'
         });
+
+        // 2. Update Parent Complaint: Attach child to parent cluster
+        if (parent) {
+          const existingIds = parent.merged_complaint_ids || [];
+          if (!existingIds.includes(id)) {
+            existingIds.push(id);
+          }
+          const existingList = parent.merged_complaints || [];
+          const childSummary = {
+            id: child.id,
+            complaint_number: child.complaint_number,
+            citizen_name: child.citizen_name,
+            citizen_phone: child.citizen_phone,
+            description: child.description,
+            address: child.address || child.landmark,
+            created_at: child.created_at
+          };
+          const filteredList = existingList.filter(m => m.id !== id);
+          filteredList.push(childSummary);
+
+          await db.updateComplaint(parent.id, {
+            merged_complaint_ids: existingIds,
+            merged_complaints: filteredList,
+            merged_count: filteredList.length + 1 // parent + all merged children
+          });
+
+          // Audit log on Parent
+          db.addAuditLog({
+            actor_id: req.user.id,
+            actor_role: req.user.role,
+            actor_name: req.user.name,
+            entity: 'complaint',
+            entity_id: parent.id,
+            action: 'MERGED_CHILD_ATTACHED',
+            old_value: null,
+            new_value: { merged_child_id: id, child_number: child.complaint_number },
+            reason: `Consolidated citizen grievance ${child.complaint_number} into this master ticket.`
+          });
+        }
+
+        // 3. Citizen Notification
+        if (child.citizen_id) {
+          await db.addNotification({
+            user_id: child.citizen_id,
+            role: 'citizen',
+            title: 'Report Merged with Nearby Incident',
+            message: `Your grievance ${child.complaint_number} was consolidated with active local issue ${parent ? parent.complaint_number : 'Master Ticket'}. Ground squads are already assigned and will resolve it.`,
+            type: 'STATUS_CHANGE',
+            complaint_id: child.id
+          });
+        }
+
+      } else if (decision === 'kept_separate' || decision === 'unlinked') {
+        // Unlinking: restore child ticket to active lifecycle
+        const restoreStatus = child.assigned_officer_id ? 'ASSIGNED' : 'UNDER_REVIEW';
+        const prevParentId = child.duplicate_of || child.merged_into || candidate_id;
+
+        await db.updateComplaint(id, {
+          status: child.status === 'CLOSED' ? restoreStatus : child.status,
+          duplicate_of: null,
+          merged_into: null,
+          merged_at: null,
+          merge_reason: null
+        });
+
+        // Detach from parent if parent was linked
+        if (prevParentId) {
+          const prevParent = db.getComplaintById(prevParentId);
+          if (prevParent) {
+            const updatedIds = (prevParent.merged_complaint_ids || []).filter(cid => cid !== id);
+            const updatedList = (prevParent.merged_complaints || []).filter(m => m.id !== id);
+            await db.updateComplaint(prevParent.id, {
+              merged_complaint_ids: updatedIds,
+              merged_complaints: updatedList,
+              merged_count: updatedList.length + 1
+            });
+
+            db.addAuditLog({
+              actor_id: req.user.id,
+              actor_role: req.user.role,
+              actor_name: req.user.name,
+              entity: 'complaint',
+              entity_id: prevParent.id,
+              action: 'MERGED_CHILD_DETACHED',
+              old_value: null,
+              new_value: { unlinked_child_id: id, child_number: child.complaint_number },
+              reason: `Unlinked duplicate report ${child.complaint_number} from this ticket.`
+            });
+          }
+        }
       }
 
+      // Audit log on Child
       db.addAuditLog({
         actor_id: req.user.id,
         actor_role: req.user.role,
@@ -243,12 +366,17 @@ export const municipalController = {
         entity: 'complaint',
         entity_id: id,
         action: `DUPLICATE_${decision.toUpperCase()}`,
-        old_value: null,
+        old_value: { status: child.status, duplicate_of: child.duplicate_of },
         new_value: { candidate_id, decision },
         reason: reason || `Duplicate decision: ${decision}`
       });
 
-      return successResponse(res, { decision, candidate_id }, `Duplicate marked as ${decision}`);
+      return successResponse(res, {
+        decision,
+        candidate_id,
+        complaint_id: id,
+        parent_number: parent?.complaint_number || null
+      }, `Duplicate successfully marked as ${decision}`);
     } catch (err) {
       next(err);
     }
@@ -322,6 +450,44 @@ export const municipalController = {
   /**
    * Get municipality departments
    */
+  async reverifyResolutionAi(req, res, next) {
+    try {
+      const { id } = req.params;
+      const complaint = db.getComplaintById(id);
+      if (!complaint) return errorResponse(res, 'Complaint not found', 'NOT_FOUND', 404);
+
+      const beforeImg = complaint.media && complaint.media.length > 0 ? complaint.media[0] : null;
+      const afterImg = complaint.resolution_evidence && complaint.resolution_evidence.length > 0 ? complaint.resolution_evidence[0] : null;
+
+      const aiRes = await aiOrchestrator.verifyResolution({
+        beforeMedia: beforeImg,
+        afterMedia: afterImg,
+        beforeMetadata: {
+          complaint_id: complaint.id,
+          lat: complaint.lat,
+          lng: complaint.lng,
+          created_at: complaint.created_at
+        },
+        afterMetadata: {
+          complaint_id: complaint.id,
+          lat: complaint.lat,
+          lng: complaint.lng,
+          created_at: complaint.resolution?.submitted_at || new Date().toISOString()
+        },
+        targetClass: complaint.ai_detections?.[0]?.class_name || null
+      });
+
+      if (complaint.resolution) {
+        complaint.resolution.ai_verification = aiRes;
+        await db.updateComplaint(id, { resolution: complaint.resolution });
+      }
+
+      return successResponse(res, aiRes, 'AI resolution verification completed');
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async getDepartments(req, res, next) {
     try {
       let municipalityId = req.user.municipality_id;

@@ -1,0 +1,71 @@
+{
+  "validation_status": "PASSED",
+  "dataset_root": "C:\\FIN Dataset\\03_Master_Dataset",
+  "artifacts_root": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts",
+  "health_metrics": {
+    "total_labels": 20132,
+    "total_bounding_boxes": 111879,
+    "background_images": 212,
+    "malformed_lines": 0,
+    "invalid_class_ids": 0,
+    "out_of_bounds_coords": 0,
+    "border_exceeded_boxes": 0,
+    "zero_area_boxes": 0,
+    "extreme_aspect_ratio_boxes": 372
+  },
+  "class_distribution": {
+    "pothole": {
+      "train": 943,
+      "val": 195,
+      "test": 245,
+      "total": 1383,
+      "pct": "1.24%"
+    },
+    "road_crack": {
+      "train": 495,
+      "val": 99,
+      "test": 118,
+      "total": 712,
+      "pct": "0.64%"
+    },
+    "surface_erosion": {
+      "train": 279,
+      "val": 73,
+      "test": 45,
+      "total": 397,
+      "pct": "0.35%"
+    },
+    "garbage_litter": {
+      "train": 63125,
+      "val": 21657,
+      "test": 5111,
+      "total": 89893,
+      "pct": "80.35%"
+    },
+    "stagnant_water": {
+      "train": 12395,
+      "val": 2666,
+      "test": 2574,
+      "total": 17635,
+      "pct": "15.76%"
+    },
+    "open_manhole": {
+      "train": 99,
+      "val": 20,
+      "test": 22,
+      "total": 141,
+      "pct": "0.13%"
+    },
+    "fault_streetlight": {
+      "train": 1258,
+      "val": 230,
+      "test": 230,
+      "total": 1718,
+      "pct": "1.54%"
+    }
+  },
+  "preservation_decisions": {
+    "background_images": "Preserved 212 clean background scenes to suppress background false positives.",
+    "thin_boxes": "Preserved 372 extreme aspect ratio annotations (verified genuine streetlight posts and horizontal cracks)."
+  }
+}

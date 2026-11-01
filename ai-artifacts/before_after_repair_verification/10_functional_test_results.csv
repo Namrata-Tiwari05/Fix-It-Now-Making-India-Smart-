@@ -1,0 +1,9 @@
+id,name,expected,decision,is_correct,requires_review,reasons
+FT01,Missing After-Image File,INCONCLUSIVE,INCONCLUSIVE,True,True,After-image validation failed: Image input is None or missing.
+FT02,Corrupted / Non-Existent After-Image Path,INCONCLUSIVE,INCONCLUSIVE,True,True,After-image validation failed: File does not exist: non_existent_file.jpg
+FT03,Identical Photo Submitted as Both Before & After (Fraudulent Re-upload),NOT_RESOLVED,NOT_RESOLVED,True,True,FRAUD DETECTED: Identical photo re-submitted as resolution proof (dHash distance: 0/64 <= 5).
+FT04,Defect Remains Clearly Detected in After-Image,NOT_RESOLVED,NOT_RESOLVED,True,True,FRAUD DETECTED: Identical photo re-submitted as resolution proof (dHash distance: 0/64 <= 5).
+FT05,Defect Cleared in After-Image with Corroborated Metadata,LIKELY_RESOLVED,LIKELY_RESOLVED,True,False,"Defect 'garbage_litter' no longer detected in after-image. | After-image is sharp, well-exposed, and scene context is verified. | CAVEAT: Absence of detection does not guarantee physical sub-surface structural integrity; recommended for citizen confirmation."
+FT06,Severely Blurry After-Image Submitted as Proof,INCONCLUSIVE,NOT_RESOLVED,False,True,After-image quality degraded: severe blur detected (variance: 1.89 < 50.0). | FRAUD DETECTED: Identical photo re-submitted as resolution proof (dHash distance: 0/64 <= 5).
+FT07,Location Mismatch (Resolution Photo Captured 120m Away),NEEDS_MANUAL_REVIEW,NEEDS_MANUAL_REVIEW,True,True,Location mismatch: Resolution photo taken 122.31m away from complaint location (> 75.0m).
+FT08,Missing GPS and Location Metadata,LIKELY_RESOLVED,LIKELY_RESOLVED,True,False,"Defect 'garbage_litter' no longer detected in after-image. | After-image is sharp, well-exposed, and scene context is verified. | CAVEAT: Absence of detection does not guarantee physical sub-surface structural integrity; recommended for citizen confirmation."

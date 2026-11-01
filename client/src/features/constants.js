@@ -5,5 +5,6 @@ export const CIVIC_CATEGORIES = [
   'Drainage & Sewerage',
   'Water Supply',
   'Public Health & Vector Control',
-  'Encroachment & Public Space'
+  'Encroachment & Public Space',
+  'Other / Non-Civic Issue'
 ];

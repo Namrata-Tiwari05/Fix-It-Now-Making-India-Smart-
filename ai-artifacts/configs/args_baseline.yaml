@@ -1,0 +1,26 @@
+model: yolov8s.pt
+data: C:/Fix It Now - Making India Smart/Fix-It-Now-Making-India-Smart/ai-artifacts/configs/data_master.yaml
+epochs: 15
+batch: 8
+imgsz: 640
+device: 0
+workers: 2
+project: C:/Fix It Now - Making India Smart/Fix-It-Now-Making-India-Smart/ai-artifacts/training_runs
+name: baseline_yolov8s
+seed: 42
+val: true
+save: true
+save_period: -1
+cache: false
+cls: 0.5
+box: 7.5
+dfl: 1.5
+mosaic: 1.0
+scale: 0.5
+close_mosaic: 10
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+fliplr: 0.5
+flipud: 0.0
+half: true

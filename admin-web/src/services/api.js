@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || ((typeof window !== 'undefined' && window.location.port === '5174') ? '/api' : 'http://127.0.0.1:5000/api');
 
 export const adminApi = {
   TOKEN_KEY: 'fixitnow_staff_token',
@@ -61,8 +61,17 @@ export const adminApi = {
     const url = isUuid
       ? `${API_BASE}/municipal/overview?municipality_id=${municipalityId}`
       : `${API_BASE}/municipal/overview`;
-    const res = await fetch(url, { headers: this.getHeaders() });
-    return res.json();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+    try {
+      const res = await fetch(url, { headers: this.getHeaders(), signal: controller.signal });
+      clearTimeout(timer);
+      return await res.json();
+    } catch (err) {
+      clearTimeout(timer);
+      console.warn('[Admin API] getMunicipalOverview network error or timeout:', err.message);
+      return { success: false, error: { message: err.message } };
+    }
   },
 
   // --- Municipal Complaints Queue with filters ---
@@ -189,11 +198,46 @@ export const adminApi = {
     return res.json();
   },
 
-  async submitOfficerResolution(id, notes, evidence = []) {
+  async validateOfficerResolution(id, notes, evidence = [], coords = {}) {
+    const res = await fetch(`${API_BASE}/officer/complaints/${id}/validate-resolution`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({
+        notes,
+        evidence,
+        officer_lat: coords?.lat,
+        officer_lng: coords?.lng
+      })
+    });
+    return res.json();
+  },
+
+  async submitOfficerResolution(id, notes, evidence = [], coords = {}) {
     const res = await fetch(`${API_BASE}/officer/complaints/${id}/resolution`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ notes, evidence })
+      body: JSON.stringify({
+        notes,
+        evidence,
+        officer_lat: coords?.lat,
+        officer_lng: coords?.lng
+      })
+    });
+    return res.json();
+  },
+
+  async uploadMedia(fileOrBlob) {
+    const formData = new FormData();
+    const filename = fileOrBlob.name || `resolution-${Date.now()}.jpg`;
+    formData.append('media', fileOrBlob, filename);
+    const token = this.getToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE}/complaints/upload-media`, {
+      method: 'POST',
+      headers,
+      body: formData
     });
     return res.json();
   },

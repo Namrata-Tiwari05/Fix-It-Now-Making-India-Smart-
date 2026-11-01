@@ -2,18 +2,24 @@
 node_modules/
 */node_modules/
 
-# Production builds
+# Production builds & cache
 dist/
 build/
 */dist/
 */build/
+.vite/
+*/.vite/
+.eslintcache
 
-# Local Environment and Secrets
+# Local Environment, Backups and Secrets (STRICT PROTECTION)
 .env
-.env.local
-.env.*.local
+.env.*
 *.env
+*.backup*
+*.bak
+backup_*/
 !.env.example
+!*/.env.example
 
 # Python
 __pycache__/
@@ -26,6 +32,20 @@ env/
 venv/
 .venv/
 ENV/
+
+# Large Model Checkpoints & Pre-trained weights (>100MB breaks GitHub push)
+yolov8s.pt
+ai-artifacts/training_runs/baseline_yolov8s/
+ai-artifacts/training_runs/improved_yolov8s/
+ai-artifacts/training_runs/v4_finetuned_yolov8s/
+*.onnx
+*.engine
+
+# Datasets & Raw Archives
+datasets/
+data/raw/
+*.zip
+*.tar.gz
 
 # Uploads & User Generated Content (preserve folder structure via .gitkeep)
 uploads/avatars/*
@@ -47,7 +67,5 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Vite cache & testing
-.vite/
-*/.vite/
-.eslintcache
+# Temporary test scripts and scratch files
+scratch/

@@ -21,6 +21,8 @@ export const config = {
     anonKey: process.env.SUPABASE_ANON_KEY || '',
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
     projectId: process.env.SUPABASE_PROJECT_ID || '',
+    publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || '',
+    databaseUrl: process.env.DATABASE_URL || '',
   },
 
   ai: {

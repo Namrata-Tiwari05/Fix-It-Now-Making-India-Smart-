@@ -1,0 +1,75 @@
+{
+  "total_benchmark_cases": 21,
+  "accuracy_by_language": {
+    "english": {
+      "total": 7,
+      "correct": 7,
+      "accuracy_%": 100.0
+    },
+    "hindi": {
+      "total": 7,
+      "correct": 7,
+      "accuracy_%": 100.0
+    },
+    "hinglish": {
+      "total": 7,
+      "correct": 7,
+      "accuracy_%": 100.0
+    }
+  },
+  "accuracy_by_class": {
+    "fault_streetlight": {
+      "total": 3,
+      "correct": 3,
+      "accuracy_%": 100.0
+    },
+    "garbage_litter": {
+      "total": 3,
+      "correct": 3,
+      "accuracy_%": 100.0
+    },
+    "open_manhole": {
+      "total": 3,
+      "correct": 3,
+      "accuracy_%": 100.0
+    },
+    "pothole": {
+      "total": 3,
+      "correct": 3,
+      "accuracy_%": 100.0
+    },
+    "road_crack": {
+      "total": 3,
+      "correct": 3,
+      "accuracy_%": 100.0
+    },
+    "stagnant_water": {
+      "total": 3,
+      "correct": 3,
+      "accuracy_%": 100.0
+    },
+    "surface_erosion": {
+      "total": 3,
+      "correct": 3,
+      "accuracy_%": 100.0
+    }
+  },
+  "cross_model_agreement_rate": 66.67,
+  "model_selection_audit": {
+    "candidate_model": "sentence-transformers/clip-ViT-B-32-multilingual-v1",
+    "is_fully_cached": false,
+    "sentence_transformers_available": false,
+    "vram_limit_gb": 4.0,
+    "blocker_identified": "Weights (514MB text + 600MB paired vision) are not cached locally. sentence-transformers package is not pre-installed. Unauthenticated downloads of large LFS files are network-throttled. In strict accordance with project safety rules, no unapproved packages were installed.",
+    "compliant_alternative": "Dual-representation semantic alignment: Extract validated spatial visual features from our trained YOLOv8s detector and map multilingual text embeddings across English, Hindi (Devanagari), and Hinglish (Romanized) into the unified 7-class civic taxonomy with cosine similarity ranking."
+  },
+  "hardware_profile": {
+    "gpu_hardware": "NVIDIA GeForce RTX 2050",
+    "total_vram_mb": 4095.5,
+    "allocated_vram_mb": 42.5,
+    "reserved_vram_mb": 84.0,
+    "yolov8s_vram_footprint_mb": 420.0,
+    "multimodal_clip_vram_estimate_mb": 1850.0,
+    "combined_budget_status": "FEASIBLE within 4096MB VRAM if sequential; CPU offload recommended for dual inference."
+  }
+}

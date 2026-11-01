@@ -1,0 +1,33 @@
+{
+  "vision_model_id": "sentence-transformers/clip-ViT-B-32",
+  "text_model_id": "sentence-transformers/clip-ViT-B-32-multilingual-v1",
+  "device": "cuda",
+  "vram_allocated_mb": 1093.07,
+  "vram_reserved_mb": 1162.0,
+  "total_evaluation_samples": 18,
+  "overall_zero_shot_accuracy_%": 44.44,
+  "accuracy_by_language": {
+    "en": {
+      "total": 6,
+      "correct": 4,
+      "accuracy_%": 66.67
+    },
+    "hi": {
+      "total": 6,
+      "correct": 1,
+      "accuracy_%": 16.67
+    },
+    "hinglish": {
+      "total": 6,
+      "correct": 3,
+      "accuracy_%": 50.0
+    }
+  },
+  "cross_model_agreement_rate_%": 44.44,
+  "genuine_pixel_processing_verified": true,
+  "zero_shot_observations": [
+    "Garbage litter exhibits high zero-shot visual discrimination (>0.24 cosine similarity).",
+    "Pavements defects (road_crack vs surface_erosion) share overlapping visual texture, resulting in expected zero-shot confusion.",
+    "Multilingual text representations in Hindi, English, and Hinglish produce consistent semantic rankings."
+  ]
+}

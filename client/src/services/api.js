@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || ((typeof window !== 'undefined' && window.location.port === '5173') ? '/api' : 'http://127.0.0.1:5000/api');
 
 export const api = {
   // Session storage keys

@@ -1,0 +1,45 @@
+{
+  "validation_status": "PASSED",
+  "dataset_root": "C:\\FIN Dataset\\03_Master_Dataset",
+  "artifacts_root": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts",
+  "health_metrics": {
+    "total_labels": 20132,
+    "total_bounding_boxes": 111879,
+    "background_images": 212,
+    "malformed_lines": 0,
+    "invalid_class_ids": 0,
+    "out_of_bounds_coords": 0,
+    "border_exceeded_boxes": 0,
+    "zero_area_boxes": 0,
+    "extreme_aspect_ratio_boxes": 372
+  },
+  "imbalance_metrics": {
+    "majority_class": "garbage_litter",
+    "majority_count": 89893,
+    "minority_class": "open_manhole",
+    "minority_count": 141,
+    "imbalance_ratio": "637.5 : 1"
+  },
+  "coco_scales": {
+    "Small (<32px)": {
+      "count": 11071,
+      "pct": "9.90%"
+    },
+    "Medium (32-96px)": {
+      "count": 45906,
+      "pct": "41.03%"
+    },
+    "Large (>96px)": {
+      "count": 54902,
+      "pct": "49.07%"
+    }
+  },
+  "preservation_decisions": {
+    "background_images": "Preserved 212 clean background scenes to suppress false positives.",
+    "thin_boxes": "Preserved 372 extreme aspect ratio annotations (verified genuine streetlight masts and road cracks)."
+  },
+  "generated_configs": {
+    "data_yaml": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts\\configs\\data_master.yaml",
+    "args_yaml": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts\\configs\\args_baseline.yaml"
+  }
+}

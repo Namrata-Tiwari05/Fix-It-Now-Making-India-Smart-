@@ -58,7 +58,7 @@ export const Topbar = ({ title, subtitle, unreadCount = 0, onSearch, searchQuery
 
         {/* Citizen App Launcher */}
         <a
-          href="http://localhost:5173"
+          href={import.meta.env.VITE_CITIZEN_APP_URL || "http://localhost:5173"}
           target="_blank"
           rel="noreferrer"
           style={{

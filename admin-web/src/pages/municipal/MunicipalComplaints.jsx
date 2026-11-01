@@ -290,7 +290,7 @@ export const MunicipalComplaints = ({ onSelectComplaint, currentRole }) => {
                   </td>
 
                   <td style={{ padding: '1rem' }}>
-                    <PriorityBadge priority={c.priority} />
+                    <PriorityBadge priority={c.priority} riskScore={c.risk_score} />
                   </td>
 
                   <td style={{ padding: '1rem' }}>

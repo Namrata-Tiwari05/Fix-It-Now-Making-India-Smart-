@@ -1,0 +1,528 @@
+{
+  "timestamp": "2026-10-30T00:13:58.144Z",
+  "total_tests": 43,
+  "passed_tests": 43,
+  "failed_tests": 0,
+  "pass_rate": "100.0%",
+  "test_cases": [
+    {
+      "id": "AUTH-01",
+      "module": "Auth",
+      "scenario": "Request OTP for citizen phone",
+      "expected": "Status 200 with devOtp generated",
+      "actual": {
+        "status": 200,
+        "devOtp": "9015"
+      },
+      "status": "PASS",
+      "details": "Phone: +919876543210, OTP: 9015"
+    },
+    {
+      "id": "AUTH-02",
+      "module": "Auth",
+      "scenario": "Verify valid OTP code",
+      "expected": "Status 200 with persistent session token",
+      "actual": {
+        "status": 200,
+        "hasToken": true
+      },
+      "status": "PASS",
+      "details": "Token: cit_ZGRkZGRkZGQtZG..."
+    },
+    {
+      "id": "AUTH-03",
+      "module": "Auth",
+      "scenario": "Reject invalid OTP code",
+      "expected": "Status 400 with INVALID_OTP",
+      "actual": {
+        "status": 400,
+        "code": "INVALID_OTP"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "AUTH-04",
+      "module": "Auth",
+      "scenario": "Reject missing OTP field",
+      "expected": "Status 400 with MISSING_FIELDS",
+      "actual": {
+        "status": 400,
+        "code": "MISSING_FIELDS"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "AUTH-05",
+      "module": "Auth",
+      "scenario": "Reject invalid Bearer token",
+      "expected": "Status 401 with INVALID_TOKEN",
+      "actual": {
+        "status": 401,
+        "code": "INVALID_TOKEN"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "AUTH-06",
+      "module": "Auth",
+      "scenario": "Reject missing Authorization header",
+      "expected": "Status 401 with UNAUTHORIZED",
+      "actual": {
+        "status": 401,
+        "code": "UNAUTHORIZED"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "AUTH-07",
+      "module": "Auth",
+      "scenario": "Retrieve authenticated session profile via /api/auth/me",
+      "expected": "Status 200 with authenticated citizen user profile",
+      "actual": {
+        "status": 200,
+        "role": "citizen"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "COMP-01",
+      "module": "Complaint",
+      "scenario": "Submit valid complaint with all fields & photo",
+      "expected": "Status 200 with created complaint object & tracking number",
+      "actual": {
+        "status": 201,
+        "number": "FIX-2026-0025"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "COMP-02",
+      "module": "Complaint",
+      "scenario": "Reject complaint missing description",
+      "expected": "Status 400 with MISSING_FIELDS",
+      "actual": {
+        "status": 400,
+        "code": "MISSING_FIELDS"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "COMP-03",
+      "module": "Complaint",
+      "scenario": "Reject complaint missing PIN code",
+      "expected": "Status 400 with MISSING_FIELDS",
+      "actual": {
+        "status": 400,
+        "code": "MISSING_FIELDS"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "COMP-04",
+      "module": "Complaint",
+      "scenario": "Process text-only complaint submission",
+      "expected": "Status 200 triaged accurately via multilingual NLP",
+      "actual": {
+        "status": 201,
+        "category": "Street Lighting"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "COMP-05",
+      "module": "Complaint",
+      "scenario": "Retrieve full complaint details by ID",
+      "expected": "Status 200 with complaint tracking details",
+      "actual": {
+        "status": 200,
+        "trackedId": "40c91161-a56c-4d76-92ef-ae5d49eb0993"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "COMP-06",
+      "module": "Complaint",
+      "scenario": "Retrieve citizen personal complaint history",
+      "expected": "Status 200 with array of citizen reports",
+      "actual": {
+        "status": 200,
+        "reportsCount": 20
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "AI-DET-01",
+      "module": "Vision",
+      "scenario": "YOLOv8 real defect detection on photographic image",
+      "expected": "Detections array populated with classes and bounding boxes",
+      "actual": {
+        "count": 1,
+        "classes": [
+          "garbage_litter"
+        ]
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "AI-DET-02",
+      "module": "Vision",
+      "scenario": "Graceful 400 error handling for unresolvable image",
+      "expected": "Status 400 Bad Request",
+      "actual": {
+        "status": 400,
+        "detail": "Could not resolve image from image_path or image_base64."
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "NLP-01",
+      "module": "NLP",
+      "scenario": "English complaint classification",
+      "expected": "Predicted class: pothole",
+      "actual": {
+        "category": "pothole",
+        "lang": "English"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "NLP-02",
+      "module": "NLP",
+      "scenario": "Hindi Devanagari complaint classification",
+      "expected": "Predicted class: open_manhole",
+      "actual": {
+        "category": "open_manhole",
+        "lang": "Hindi"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "NLP-03",
+      "module": "NLP",
+      "scenario": "Hinglish transliterated complaint classification",
+      "expected": "Predicted class: fault_streetlight",
+      "actual": {
+        "category": "fault_streetlight",
+        "lang": "Hinglish"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "NLP-04",
+      "module": "NLP",
+      "scenario": "Negation tracking in text descriptions",
+      "expected": "Supporting evidence flags is_negated: true",
+      "actual": {
+        "is_negated": true,
+        "status": "NEGATED_FLAG"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "NLP-05",
+      "module": "NLP",
+      "scenario": "Multi-intent civic hazard handling",
+      "expected": "Supporting evidence flags multiple_issues_mentioned: true",
+      "actual": {
+        "multiple": true,
+        "candidates": 2
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "NLP-06",
+      "module": "NLP",
+      "scenario": "Empty input handling with manual review flag",
+      "expected": "Requires manual review: true",
+      "actual": {
+        "review": true,
+        "status": "UNINFORMATIVE_OR_EMPTY"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "PRI-01",
+      "module": "Priority",
+      "scenario": "Deterministic override: Open manhole -> CRITICAL",
+      "expected": "Priority CRITICAL with risk score >= 80",
+      "actual": {
+        "priority": "CRITICAL",
+        "score": 85
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "PRI-02",
+      "module": "Priority",
+      "scenario": "Deterministic override: Live sparking wire -> CRITICAL",
+      "expected": "Priority CRITICAL triggered by electrical shock hazard",
+      "actual": {
+        "priority": "CRITICAL",
+        "score": 85
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "PRI-03",
+      "module": "Priority",
+      "scenario": "Deterministic override: Healthcare corridor obstruction -> CRITICAL",
+      "expected": "Priority CRITICAL triggered by hospital obstruction",
+      "actual": {
+        "priority": "CRITICAL",
+        "score": 80
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "PRI-04",
+      "module": "Priority",
+      "scenario": "Low severity complaint -> LOW priority tier",
+      "expected": "Priority LOW with transparent risk scoring breakdown",
+      "actual": {
+        "priority": "LOW",
+        "score": 20
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "HYB-01",
+      "module": "Hybrid",
+      "scenario": "Corroborated image and text context agreement",
+      "expected": "Status MATCH with corroborated agreement",
+      "actual": {
+        "status": "MATCH"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "HYB-02",
+      "module": "Hybrid",
+      "scenario": "Contradictory evidence identification",
+      "expected": "Status MISMATCH with detailed mismatch reasons",
+      "actual": {
+        "status": "MISMATCH",
+        "reasons": [
+          "Contradiction: Photo depicts 'Solid Waste & Sanitation' (garbage_litter) while text claims 'Street Lighting' (fault_streetlight)."
+        ]
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "DUP-01",
+      "module": "Duplicates",
+      "scenario": "Spatial + perceptual duplicate candidate scoring",
+      "expected": "Candidate cand-01 identified as DUPLICATE based on proximity & image match",
+      "actual": {
+        "topCandidate": "cand-01",
+        "decision": "DUPLICATE",
+        "similarity": 0.95
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "VERIF-01",
+      "module": "Repair",
+      "scenario": "Fraud detection: Identical photo re-submitted",
+      "expected": "Decision NOT_RESOLVED with evidence.is_identical_photo: true",
+      "actual": {
+        "decision": "NOT_RESOLVED",
+        "reasons": [
+          "FRAUD DETECTED: Identical photo re-submitted as resolution proof (dHash distance: 0/64 <= 5)."
+        ]
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "VERIF-02",
+      "module": "Repair",
+      "scenario": "Inconclusive decision for missing resolution photo",
+      "expected": "Decision INCONCLUSIVE requiring supervisory manual review",
+      "actual": {
+        "decision": "INCONCLUSIVE"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-01",
+      "module": "RBAC",
+      "scenario": "Municipal Admin shared staff portal authentication",
+      "expected": "Status 200 with municipal_admin role and session token",
+      "actual": {
+        "status": 200,
+        "role": "municipal_admin"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-02",
+      "module": "RBAC",
+      "scenario": "Field Officer shared staff portal authentication",
+      "expected": "Status 200 with field_officer role and session token",
+      "actual": {
+        "status": 200,
+        "role": "field_officer"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-03",
+      "module": "Workflow",
+      "scenario": "Field Officer submits resolution with advisory AI verification",
+      "expected": "Status RESOLUTION_SUBMITTED with attached ai_verification audit",
+      "actual": {
+        "status": "RESOLUTION_SUBMITTED",
+        "aiDecision": "LIKELY_RESOLVED"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-04",
+      "module": "Workflow",
+      "scenario": "Municipal Admin invokes on-demand AI re-verification",
+      "expected": "Status 200 with re-evaluated decision and quality assessment",
+      "actual": {
+        "decision": "LIKELY_RESOLVED"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-05",
+      "module": "Workflow",
+      "scenario": "Municipal Admin verifies resolution -> Status VERIFICATION",
+      "expected": "Status transitioned to VERIFICATION for citizen sign-off",
+      "actual": {
+        "status": "VERIFICATION"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-06",
+      "module": "Workflow",
+      "scenario": "Citizen confirms resolution -> Status RESOLVED (Ticket Closed)",
+      "expected": "Status transitioned to RESOLVED with rating recorded",
+      "actual": {
+        "status": "RESOLVED",
+        "rating": 5
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-07",
+      "module": "Workflow",
+      "scenario": "Citizen reopens complaint -> Status REOPENED",
+      "expected": "Status transitioned to REOPENED with reopen_count incremented",
+      "actual": {
+        "status": "REOPENED",
+        "count": 1
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "STAFF-08",
+      "module": "RBAC",
+      "scenario": "Access restriction: Citizen forbidden on Municipal Admin route",
+      "expected": "Status 403 Forbidden with FORBIDDEN error code",
+      "actual": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "SYS-01",
+      "module": "System",
+      "scenario": "Express to FastAPI socket communication within SLA",
+      "expected": "Responded in 9ms (< 3000ms)",
+      "actual": {
+        "latencyMs": 9,
+        "category": "Drainage & Sewerage"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "SYS-02",
+      "module": "System",
+      "scenario": "Complaint records persistently committed to store.json",
+      "expected": "Complaint record verified in persistent disk storage",
+      "actual": {
+        "persisted": true
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "SYS-03",
+      "module": "Storage",
+      "scenario": "Camera evidence image upload via multipart/form-data",
+      "expected": "Status 200 with persistent storage URL generated",
+      "actual": {
+        "status": 200,
+        "url": "http://localhost:5000/uploads/complaints/evidence-1793319238001-622179481.png"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "SYS-04",
+      "module": "Storage",
+      "scenario": "Static retrieval of uploaded evidence file over HTTP",
+      "expected": "Status 200 OK for statically served upload",
+      "actual": {
+        "status": 200,
+        "contentType": "image/png"
+      },
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "SYS-05",
+      "module": "System",
+      "scenario": "Resilient local offline fallback preserves CRITICAL safety invariant",
+      "expected": "Local engine assigns Drainage & Sewerage and CRITICAL priority",
+      "actual": {
+        "category": "Drainage & Sewerage",
+        "priority": "CRITICAL",
+        "reason": "Immediate pedestrian fall hazard (open sewer/manhole)."
+      },
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

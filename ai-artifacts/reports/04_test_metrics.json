@@ -1,0 +1,85 @@
+{
+  "split": "held_out_test",
+  "protocol_status": "AUTHORIZED_POST_MODEL_SELECTION",
+  "dataset_images": 2198,
+  "dataset_instances": 8345,
+  "checkpoint": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts\\training_runs\\baseline_yolov8s\\weights\\best.pt",
+  "best_epoch": 14,
+  "overall": {
+    "precision": 0.538,
+    "recall": 0.569,
+    "mAP50": 0.553,
+    "mAP50_95": 0.3435
+  },
+  "per_class": [
+    {
+      "Class": "pothole",
+      "Images": 101,
+      "Instances": 245,
+      "Box-P": 0.48,
+      "Box-R": 0.502,
+      "mAP50": 0.52,
+      "mAP50-95": 0.206
+    },
+    {
+      "Class": "road_crack",
+      "Images": 97,
+      "Instances": 118,
+      "Box-P": 0.346,
+      "Box-R": 0.297,
+      "mAP50": 0.241,
+      "mAP50-95": 0.0897
+    },
+    {
+      "Class": "surface_erosion",
+      "Images": 45,
+      "Instances": 45,
+      "Box-P": 0.242,
+      "Box-R": 0.8,
+      "mAP50": 0.571,
+      "mAP50-95": 0.293
+    },
+    {
+      "Class": "garbage_litter",
+      "Images": 1538,
+      "Instances": 5111,
+      "Box-P": 0.543,
+      "Box-R": 0.574,
+      "mAP50": 0.586,
+      "mAP50-95": 0.398
+    },
+    {
+      "Class": "stagnant_water",
+      "Images": 258,
+      "Instances": 2574,
+      "Box-P": 0.487,
+      "Box-R": 0.08,
+      "mAP50": 0.172,
+      "mAP50-95": 0.0495
+    },
+    {
+      "Class": "open_manhole",
+      "Images": 22,
+      "Instances": 22,
+      "Box-P": 0.678,
+      "Box-R": 0.727,
+      "mAP50": 0.787,
+      "mAP50-95": 0.453
+    },
+    {
+      "Class": "fault_streetlight",
+      "Images": 115,
+      "Instances": 230,
+      "Box-P": 0.992,
+      "Box-R": 1.0,
+      "mAP50": 0.995,
+      "mAP50-95": 0.915
+    }
+  ],
+  "generalization_delta_vs_val": {
+    "mAP50_delta": 0.0388,
+    "mAP50_95_delta": 0.0207,
+    "precision_delta": -0.07,
+    "recall_delta": 0.0667
+  }
+}

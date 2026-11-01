@@ -176,13 +176,49 @@ class DatabaseStore {
               }
               this.municipality_pincodes = Array.from(pinMap.values());
             }
-            if (wards?.length) this.wards = wards;
-            if (depts?.length) this.departments = depts;
-            if (officers?.length) this.officers = officers;
-            if (profs?.length) this.profiles = profs;
-            if (comps?.length) this.complaints = comps;
-            if (media?.length) this.complaint_media = media;
-            if (ai?.length) this.ai_analyses = ai;
+            if (wards?.length) {
+              const wardMap = new Map(this.wards.map(w => [w.id, w]));
+              for (const rw of wards) wardMap.set(rw.id, rw);
+              this.wards = Array.from(wardMap.values());
+            }
+            if (depts?.length) {
+              const deptMap = new Map(this.departments.map(d => [d.id, d]));
+              for (const rd of depts) deptMap.set(rd.id, rd);
+              this.departments = Array.from(deptMap.values());
+            }
+            if (officers?.length) {
+              const officerMap = new Map(this.officers.map(o => [o.id, o]));
+              for (const ro of officers) officerMap.set(ro.id, ro);
+              this.officers = Array.from(officerMap.values());
+            }
+            if (profs?.length) {
+              const profMap = new Map(this.profiles.map(p => [p.email || p.id, p]));
+              for (const rp of profs) profMap.set(rp.email || rp.id, rp);
+              this.profiles = Array.from(profMap.values());
+            }
+            if (comps?.length) {
+              const compMap = new Map(this.complaints.map(c => [c.id, c]));
+              for (const remoteC of comps) {
+                if (!compMap.has(remoteC.id)) {
+                  compMap.set(remoteC.id, remoteC);
+                }
+              }
+              this.complaints = Array.from(compMap.values());
+            }
+            if (media?.length) {
+              const mediaMap = new Map(this.complaint_media.map(m => [m.id, m]));
+              for (const rm of media) {
+                if (!mediaMap.has(rm.id)) mediaMap.set(rm.id, rm);
+              }
+              this.complaint_media = Array.from(mediaMap.values());
+            }
+            if (ai?.length) {
+              const aiMap = new Map(this.ai_analyses.map(a => [a.id, a]));
+              for (const ra of ai) {
+                if (!aiMap.has(ra.id)) aiMap.set(ra.id, ra);
+              }
+              this.ai_analyses = Array.from(aiMap.values());
+            }
             if (dups?.length) this.complaint_duplicates = dups;
             if (assigns?.length) this.assignments = assigns;
             if (resols?.length) this.resolutions = resols;
@@ -401,7 +437,10 @@ class DatabaseStore {
     const mapping = this.municipality_pincodes.find(p => p.pincode === cleanPin && (p.active === true || p.active === undefined));
     if (!mapping) return null;
 
-    const municipality = this.municipalities.find(m => m.id === mapping.municipality_id && (m.status === 'active' || m.status === undefined));
+    let municipality = this.municipalities.find(m => m.id === mapping.municipality_id && (m.status === 'active' || m.status === undefined));
+    if (!municipality && (cleanPin.startsWith('273') || mapping.municipality_id === 'm1111111-1111-1111-1111-111111111111')) {
+      municipality = this.municipalities.find(m => m.code === 'GMC-UP' || m.id === '71884451-a6e5-4093-8de5-184a2954c19a');
+    }
     if (!municipality) return null;
 
     const ward = mapping.ward_id ? this.wards.find(w => w.id === mapping.ward_id) : null;
@@ -480,6 +519,7 @@ class DatabaseStore {
       description: data.description || '',
       is_routing_review: Boolean(data.is_routing_review),
       ai_status: data.ai_status || 'COMPLETED',
+      ai_detections: data.ai_detections || [],
       due_at: data.due_at || new Date(Date.now() + 48 * 3600000).toISOString(),
       sla_breached: false,
       reopen_count: 0,
@@ -490,13 +530,18 @@ class DatabaseStore {
       updated_at: new Date().toISOString()
     };
 
-    // 1. Insert complaint into Supabase (best effort)
+    // 1. Insert complaint into Supabase (Authoritative)
     if (supabaseAdminClient) {
       try {
         const { error } = await supabaseAdminClient.from('complaints').insert(complaint);
-        if (error) console.warn('[DatabaseStore] Error inserting complaint to Supabase:', error.message);
+        if (error) {
+          console.error('[DatabaseStore] Error inserting complaint to Supabase:', error.message);
+          if (process.env.NODE_ENV === 'production') {
+            throw new Error(`Database error creating complaint: ${error.message}`);
+          }
+        }
       } catch (e) {
-        // Ignored
+        if (process.env.NODE_ENV === 'production') throw e;
       }
     }
 
@@ -520,7 +565,7 @@ class DatabaseStore {
         this.complaint_media.push(mediaObj);
 
         if (supabaseAdminClient) {
-          supabaseAdminClient.from('complaint_media').insert(mediaObj).then(() => {}, () => {});
+          await supabaseAdminClient.from('complaint_media').insert(mediaObj);
         }
       }
     }
@@ -628,13 +673,82 @@ class DatabaseStore {
         const payload = { ...updates, updated_at: updated.updated_at };
         delete payload.media;
         delete payload.sla_metrics;
-        supabaseAdminClient.from('complaints').update(payload).eq('id', updated.id).then(() => {}, () => {});
+        await supabaseAdminClient.from('complaints').update(payload).eq('id', updated.id);
       } catch (err) {
-        // Ignored
+        console.warn('[DatabaseStore] Supabase updateComplaint sync error:', err.message);
       }
     }
 
     return updated;
+  }
+
+  // Authoritative Assignment Creation
+  async createAssignment(assignment) {
+    const record = {
+      id: assignment.id || `asg-${Date.now()}-${uuidv4().slice(0, 6)}`,
+      complaint_id: assignment.complaint_id,
+      department_id: assignment.department_id || null,
+      officer_id: assignment.officer_id || null,
+      assigned_by: assignment.assigned_by || null,
+      assigned_at: assignment.assigned_at || new Date().toISOString(),
+      due_at: assignment.due_at || null,
+      notes: assignment.notes || 'Assigned by Municipal Administrator',
+      status: assignment.status || 'ASSIGNED'
+    };
+
+    if (supabaseAdminClient) {
+      try {
+        const { error } = await supabaseAdminClient.from('assignments').insert(record);
+        if (error) {
+          console.error('[DatabaseStore] Error inserting assignment to Supabase:', error.message);
+          if (process.env.NODE_ENV === 'production') {
+            throw new Error(`Database error recording assignment: ${error.message}`);
+          }
+        }
+      } catch (err) {
+        if (process.env.NODE_ENV === 'production') throw err;
+      }
+    }
+
+    this.assignments.unshift(record);
+    this.persist();
+    return record;
+  }
+
+  // Authoritative Resolution Creation
+  async createResolution(resData) {
+    const record = {
+      id: resData.id || `res-${Date.now()}-${uuidv4().slice(0, 6)}`,
+      complaint_id: resData.complaint_id,
+      officer_id: resData.officer_id || null,
+      notes: resData.notes || '',
+      evidence: resData.evidence ? (typeof resData.evidence === 'object' ? resData.evidence : JSON.parse(resData.evidence)) : null,
+      submitted_at: resData.submitted_at || new Date().toISOString(),
+      verified_by: resData.verified_by || null,
+      verified_at: resData.verified_at || null,
+      citizen_confirmed: Boolean(resData.citizen_confirmed),
+      citizen_rating: resData.citizen_rating || null,
+      citizen_feedback: resData.citizen_feedback || null,
+      reopen_reason: resData.reopen_reason || null
+    };
+
+    if (supabaseAdminClient) {
+      try {
+        const { error } = await supabaseAdminClient.from('resolutions').insert(record);
+        if (error) {
+          console.error('[DatabaseStore] Error inserting resolution to Supabase:', error.message);
+          if (process.env.NODE_ENV === 'production') {
+            throw new Error(`Database error recording resolution: ${error.message}`);
+          }
+        }
+      } catch (err) {
+        if (process.env.NODE_ENV === 'production') throw err;
+      }
+    }
+
+    this.resolutions.unshift(record);
+    this.persist();
+    return record;
   }
 
   // --- Audit Logging ---
@@ -664,7 +778,7 @@ class DatabaseStore {
 
     if (supabaseAdminClient) {
       try {
-        supabaseAdminClient.from('audit_logs').insert(log).then(() => {}, () => {});
+        await supabaseAdminClient.from('audit_logs').insert(log);
       } catch (err) {
         // Ignored
       }
@@ -710,7 +824,7 @@ class DatabaseStore {
 
     if (supabaseAdminClient && validUserId) {
       try {
-        supabaseAdminClient.from('notifications').insert(item).then(() => {}, () => {});
+        await supabaseAdminClient.from('notifications').insert(item);
       } catch (err) {
         // Ignored
       }
@@ -756,7 +870,21 @@ class DatabaseStore {
       resolved,
       statusCounts,
       categoriesCount,
-      recentComplaints: complaints.slice(0, 8)
+      recentComplaints: complaints.slice(0, 8).map(c => ({
+        id: c.id,
+        complaint_number: c.complaint_number,
+        description: c.description,
+        category: c.category,
+        priority: c.priority,
+        status: c.status,
+        pincode: c.pincode,
+        ward_name: c.ward_name,
+        address: c.address,
+        assigned_officer_name: c.assigned_officer_name,
+        due_at: c.due_at,
+        sla_breached: c.sla_breached,
+        created_at: c.created_at
+      }))
     };
   }
 
@@ -964,7 +1092,7 @@ class DatabaseStore {
           is_profile_completed: profile.is_profile_completed,
           is_active: true
         };
-        supabaseAdminClient.from('profiles').upsert(payload).then(() => {}, () => {});
+        await supabaseAdminClient.from('profiles').upsert(payload);
       } catch (e) {
         // Ignored
       }

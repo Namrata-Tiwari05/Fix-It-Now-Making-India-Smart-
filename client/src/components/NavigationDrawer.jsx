@@ -31,7 +31,7 @@ export const NavigationDrawer = ({
         aria-hidden="true"
       />
 
-      {/* Slide-out Drawer (approx. half screen width: ~52%, min 230px, max 300px) */}
+      {/* Slide-out Drawer */}
       <aside
         style={{
           position: 'fixed',
@@ -39,8 +39,8 @@ export const NavigationDrawer = ({
           right: 0,
           bottom: 0,
           width: '54%',
-          minWidth: '235px',
-          maxWidth: '300px',
+          minWidth: '240px',
+          maxWidth: '310px',
           backgroundColor: 'var(--drawer-bg, #12181F)',
           color: 'var(--text-primary, #F8FAFC)',
           borderLeft: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
@@ -84,7 +84,7 @@ export const NavigationDrawer = ({
               >
                 F
               </div>
-              <span style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '-0.01em' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--text-primary, #F8FAFC)' }}>
                 Fix It Now
               </span>
             </div>
@@ -146,7 +146,8 @@ export const NavigationDrawer = ({
                   fontWeight: 700,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  textOverflow: 'ellipsis',
+                  color: 'var(--text-primary, #F8FAFC)'
                 }}
               >
                 {citizenName}
@@ -157,7 +158,7 @@ export const NavigationDrawer = ({
             </div>
           </div>
 
-          {/* Primary Navigation Options (Exactly 3: My Profile, Theme, Logout) */}
+          {/* Primary Navigation Options */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {/* 1. My Profile */}
             <button

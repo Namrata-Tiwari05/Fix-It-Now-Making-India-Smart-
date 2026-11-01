@@ -20,6 +20,7 @@ router.patch('/complaints/:id/status', municipalController.updateStatus);
 router.post('/complaints/:id/ai-override', municipalController.overrideAI);
 router.post('/complaints/:id/link-duplicate', municipalController.linkDuplicate);
 router.post('/complaints/:id/verify-resolution', municipalController.verifyResolution);
+router.post('/complaints/:id/reverify-resolution-ai', municipalController.reverifyResolutionAi);
 
 // Municipal Operational Resources
 router.get('/departments', municipalController.getDepartments);

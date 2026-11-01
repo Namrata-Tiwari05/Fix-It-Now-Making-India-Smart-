@@ -1,0 +1,34 @@
+{
+  "evaluation_timestamp": "2026-10-29T17:24:15Z",
+  "benchmark_cases_count": 28,
+  "category_classification": {
+    "overall_accuracy": 1.0,
+    "per_language_accuracy": {
+      "English": 1.0,
+      "Hindi": 1.0,
+      "Hinglish": 1.0,
+      "None": 1.0
+    }
+  },
+  "priority_assignment": {
+    "overall_match_rate": 0.7857,
+    "critical_underprioritized_count": 0,
+    "safety_overrides_activated": 6,
+    "manual_review_rate": 0.2143
+  },
+  "canonical_classes": [
+    "pothole",
+    "road_crack",
+    "surface_erosion",
+    "garbage_litter",
+    "stagnant_water",
+    "open_manhole",
+    "fault_streetlight"
+  ],
+  "priority_tiers": [
+    "CRITICAL",
+    "HIGH",
+    "MEDIUM",
+    "LOW"
+  ]
+}

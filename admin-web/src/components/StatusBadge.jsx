@@ -10,6 +10,7 @@ const STATUS_CONFIG = {
   VERIFICATION: { label: 'Verification', bg: 'rgba(212, 255, 0, 0.2)', text: '#D4FF00', border: 'rgba(212, 255, 0, 0.4)' },
   RESOLVED: { label: 'Resolved', bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', border: 'rgba(16, 185, 129, 0.3)' },
   CLOSED: { label: 'Closed', bg: 'rgba(100, 116, 139, 0.2)', text: '#94A3B8', border: 'rgba(100, 116, 139, 0.3)' },
+  MERGED_DUPLICATE: { label: 'Merged Duplicate', bg: 'rgba(245, 158, 11, 0.15)', text: '#F59E0B', border: 'rgba(245, 158, 11, 0.35)' },
   REOPENED: { label: 'Reopened', bg: 'rgba(239, 68, 68, 0.2)', text: '#FCA5A5', border: 'rgba(239, 68, 68, 0.4)' },
   REJECTED: { label: 'Rejected', bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', border: 'rgba(239, 68, 68, 0.3)' }
 };

@@ -1,0 +1,4 @@
+split,image_count,label_count,img_dir,lbl_dir,image_pct
+train,14263,14263,C:\FIN Dataset\03_Master_Dataset\images\train,C:\FIN Dataset\03_Master_Dataset\labels\train,70.85%
+val,3671,3671,C:\FIN Dataset\03_Master_Dataset\images\val,C:\FIN Dataset\03_Master_Dataset\labels\val,18.23%
+test,2198,2198,C:\FIN Dataset\03_Master_Dataset\images\test,C:\FIN Dataset\03_Master_Dataset\labels\test,10.92%

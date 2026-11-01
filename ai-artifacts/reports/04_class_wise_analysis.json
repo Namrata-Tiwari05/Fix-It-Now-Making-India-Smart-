@@ -1,0 +1,72 @@
+{
+  "fault_streetlight": {
+    "class_id": 6,
+    "val_mAP50": 0.995,
+    "test_mAP50": 0.995,
+    "val_precision": 0.9964,
+    "val_recall": 1.0,
+    "status": "PRODUCTION_READY",
+    "findings": "Outstanding accuracy. Streetlight structures provide stark geometric and contrast signals, making detection near-perfect across day and night conditions.",
+    "recommendation": "Deploy directly to production with high confidence threshold (conf >= 0.50)."
+  },
+  "open_manhole": {
+    "class_id": 5,
+    "val_mAP50": 0.6115,
+    "test_mAP50": 0.787,
+    "val_precision": 0.7912,
+    "val_recall": 0.55,
+    "status": "SOLID_SAFETY_CRITICAL",
+    "findings": "High precision (79.1% val, 67.8% test) ensures low false alarm rate. Test mAP50 reached 78.7%. Circular rim and dark cavity provide strong visual cues. Lower recall (55%) means partially covered or shadowed manholes are occasionally missed.",
+    "recommendation": "Use safety-biased operating threshold (conf = 0.20-0.25) to boost recall and prioritize urgent human review."
+  },
+  "garbage_litter": {
+    "class_id": 3,
+    "val_mAP50": 0.566,
+    "test_mAP50": 0.586,
+    "val_precision": 0.6588,
+    "val_recall": 0.4979,
+    "status": "STRONG_BASELINE",
+    "findings": "Handles the largest and most cluttered class (21,657 val instances, 5,111 test instances) with stable 56-58% mAP and 66% precision. False negatives occur in dense, diffuse heaps where individual bags blur together.",
+    "recommendation": "Standard operational threshold (conf = 0.35) is well-suited for automated sanitary worker dispatch."
+  },
+  "surface_erosion": {
+    "class_id": 2,
+    "val_mAP50": 0.5347,
+    "test_mAP50": 0.571,
+    "val_precision": 0.3891,
+    "val_recall": 0.6438,
+    "status": "MODERATE_RELIABILITY",
+    "findings": "Strong recall (64.4% val, 80.0% test) ensures erosion patches are identified, but lower precision (38.9%) causes occasional confusion with adjacent asphalt discoloration and coarse gravel.",
+    "recommendation": "Merge or cluster adjacent erosion boxes with spatial NMS before reporting."
+  },
+  "pothole": {
+    "class_id": 0,
+    "val_mAP50": 0.505,
+    "test_mAP50": 0.52,
+    "val_precision": 0.5544,
+    "val_recall": 0.5026,
+    "status": "SOLID_BASELINE",
+    "findings": "Core civic issue shows balanced 55% precision and 50% recall. Difficulties arise with shallow puddles inside potholes (confused with stagnant water) and tree canopy shadows.",
+    "recommendation": "Operating threshold of conf = 0.30 provides optimal trade-off for civic reporting."
+  },
+  "road_crack": {
+    "class_id": 1,
+    "val_mAP50": 0.2433,
+    "test_mAP50": 0.241,
+    "val_precision": 0.3507,
+    "val_recall": 0.2828,
+    "status": "NEEDS_RESOLUTION_IMPROVEMENT",
+    "findings": "Hairline cracks occupy only 2-5 pixels in width at 640x640 resolution. Standard anchor-free downsampling (stride 8, 16, 32) loses fine linear features, leading to low mAP.",
+    "recommendation": "In future iterations (Notebook 05+), test tiled inference (SAHI) or higher input resolution (imgsz=800 or 1024) to preserve thin edges."
+  },
+  "stagnant_water": {
+    "class_id": 4,
+    "val_mAP50": 0.144,
+    "test_mAP50": 0.172,
+    "val_precision": 0.5153,
+    "val_recall": 0.039,
+    "status": "NEEDS_AUGMENTATION_AND_DATA_EXPANSION",
+    "findings": "High precision (51.5%) but severe recall deficiency (3.9% val, 8.0% test). In non-reflective conditions, still water is visually indistinguishable from dry dark asphalt without specular reflections or sky glare.",
+    "recommendation": "Supplement training with rainy/wet road datasets, apply contrast-limited adaptive histogram equalization (CLAHE), and evaluate color jitter augmentations."
+  }
+}

@@ -12,6 +12,7 @@ router.use(requireRole(['field_officer', 'municipal_admin', 'master_admin']));
 // Operational tasks
 router.get('/assignments', officerController.getMyAssignments);
 router.patch('/complaints/:id/status', officerController.updateStatus);
+router.post('/complaints/:id/validate-resolution', officerController.preValidateResolution);
 router.post('/complaints/:id/resolution', officerController.submitResolution);
 
 export default router;

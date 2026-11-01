@@ -28,9 +28,22 @@ if (!fs.existsSync(publicUploadsDir)) {
 }
 app.use('/uploads', express.static(publicUploadsDir));
 
-// Enable CORS for all local development web origins
+// Configurable CORS for production Vercel frontends & local development
+const rawAllowedOrigins = process.env.ALLOWED_ORIGINS || process.env.CORS_ORIGIN || '';
+const customOrigins = rawAllowedOrigins.split(',').map(s => s.trim()).filter(Boolean);
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (process.env.NODE_ENV !== 'production' || customOrigins.includes('*') || customOrigins.length === 0) {
+      return callback(null, true);
+    }
+    if (customOrigins.includes(origin) || /\.vercel\.app$/.test(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(Origin  not permitted by CORS policy));
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Role', 'X-User-Id']
 }));
@@ -48,6 +61,82 @@ app.use((req, res, next) => {
     }
   });
   next();
+});
+
+// Root status endpoint for browser and API probes
+app.get('/', (req, res) => {
+  if (req.accepts('html')) {
+    return res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FixItNow Civic Backend</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; max-width: 600px; width: 100%; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .badge { display: inline-block; background: #059669; color: #ffffff; padding: 4px 12px; border-radius: 9999px; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 16px; }
+    h1 { margin: 0 0 8px 0; font-size: 24px; color: #ffffff; }
+    p { color: #94a3b8; font-size: 15px; line-height: 1.5; margin: 0 0 24px 0; }
+    .links { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .btn { display: flex; align-items: center; justify-content: space-between; background: #334155; color: #f8fafc; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; transition: background 0.2s; }
+    .btn:hover { background: #475569; }
+    .btn-primary { background: #2563eb; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .footer { margin-top: 24px; font-size: 12px; color: #64748b; border-top: 1px solid #334155; padding-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">● Server Online</span>
+    <h1>FixItNow Civic Backend API</h1>
+    <p>The Express civic backend is running healthy on <code>port 5000</code>. This is an API service. To use the platform, open the citizen or municipal web applications below:</p>
+    
+    <div class="links">
+      <a href="http://localhost:5173" class="btn btn-primary" target="_blank">
+        <span>👤 Open Citizen Portal</span>
+        <span>localhost:5173 &rarr;</span>
+      </a>
+      <a href="http://localhost:5174" class="btn" target="_blank">
+        <span>🏛️ Open Municipal Admin Portal</span>
+        <span>localhost:5174 &rarr;</span>
+      </a>
+      <a href="http://127.0.0.1:8000/docs" class="btn" target="_blank">
+        <span>🤖 Open FastAPI AI Docs & Swagger</span>
+        <span>127.0.0.1:8000 &rarr;</span>
+      </a>
+      <a href="/api/health" class="btn" target="_blank">
+        <span>🩺 Inspect JSON Health Probe</span>
+        <span>/api/health &rarr;</span>
+      </a>
+    </div>
+
+    <div class="footer">
+      FixItNow Platform v1.0.0 &bull; Environment: development &bull; Local Persistent DB Active
+    </div>
+  </div>
+</body>
+</html>`);
+  }
+
+  res.json({
+    status: 'online',
+    service: 'FixItNow Civic Backend',
+    version: '1.0.0',
+    port: config.port,
+    endpoints: {
+      health: '/api/health',
+      complaints: '/api/complaints',
+      auth: '/api/auth',
+      municipal: '/api/municipal',
+      officer: '/api/officer'
+    },
+    frontends: {
+      citizen: 'http://localhost:5173',
+      admin: 'http://localhost:5174',
+      aiService: 'http://127.0.0.1:8000'
+    }
+  });
 });
 
 // Health check endpoint

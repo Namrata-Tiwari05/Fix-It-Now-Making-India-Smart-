@@ -1,0 +1,11 @@
+{
+  "gps_same_spot_m": 30.0,
+  "gps_immediate_vicinity_m": 75.0,
+  "gps_distant_cutoff_m": 150.0,
+  "dhash_duplicate_max_dist": 6,
+  "visual_sim_duplicate_min": 0.85,
+  "visual_sim_moderate_min": 0.72,
+  "text_sim_duplicate_min": 0.6,
+  "text_sim_moderate_min": 0.45,
+  "reopen_resolved_window_days": 14
+}

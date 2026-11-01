@@ -62,8 +62,9 @@ export const CitizenLogin = ({ onLoginSuccess, initialPhone = '', initialStep = 
       if (res.success) {
         setStep('otp');
         setTimer(30);
-        if (res.data?.devOtp) {
-          setDevOtpNotice(res.data.devOtp);
+        const otpCode = res.data?.devOtp || res.data?.otp;
+        if (otpCode) {
+          setDevOtpNotice(String(otpCode));
         } else {
           setDevOtpNotice(null);
         }
@@ -516,6 +517,50 @@ export const CitizenLogin = ({ onLoginSuccess, initialPhone = '', initialStep = 
               <p style={{ fontSize: '0.78rem', color: '#94A3B8', marginTop: '0.25rem', lineHeight: 1.4 }}>
                 Enter the 4-digit code sent to <strong style={{ color: '#F8FAFC' }}>+91 {phone}</strong>
               </p>
+
+              {devOtpNotice && (
+                <div
+                  style={{
+                    backgroundColor: 'rgba(212, 255, 0, 0.12)',
+                    border: '1px solid rgba(212, 255, 0, 0.4)',
+                    borderRadius: '12px',
+                    padding: '0.65rem 1rem',
+                    color: '#D4FF00',
+                    fontSize: '0.85rem',
+                    marginTop: '0.85rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.6rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(212, 255, 0, 0.1)'
+                  }}
+                  onClick={() => {
+                    if (devOtpNotice && devOtpNotice.length === 4) {
+                      setOtp(devOtpNotice.split(''));
+                    }
+                  }}
+                  title="Click to auto-fill OTP"
+                >
+                  <Sparkles size={16} style={{ color: '#D4FF00', flexShrink: 0 }} />
+                  <span>
+                    Your OTP is: <strong style={{ fontSize: '1.15rem', letterSpacing: '3px', color: '#FFFFFF', fontWeight: 900 }}>{devOtpNotice}</strong>
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      color: '#0F172A',
+                      backgroundColor: '#D4FF00',
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      fontWeight: 800,
+                      marginLeft: '4px'
+                    }}
+                  >
+                    Auto-Fill ↵
+                  </span>
+                </div>
+              )}
 
               {/* 4 Inputs */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '0.6rem', marginTop: '1.25rem' }}>

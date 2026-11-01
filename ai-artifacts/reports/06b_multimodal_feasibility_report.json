@@ -1,0 +1,47 @@
+{
+  "status": "BLOCKED_ON_DEPENDENCIES_AND_WEIGHTS",
+  "target_model_id": "sentence-transformers/clip-ViT-B-32-multilingual-v1",
+  "packages_status": {
+    "sentence_transformers": "NOT INSTALLED",
+    "transformers": "INSTALLED (v5.14.1)",
+    "torchvision": "INSTALLED (v0.26.0+cu128)",
+    "open_clip": "NOT INSTALLED"
+  },
+  "cache_inspection": {
+    "text_cache_exists": true,
+    "text_weights_ready": false,
+    "incomplete_blobs": [
+      "7b968c09938603158413ea2c91af82e82158ebb6db901a6cf97c28ce7d7ebc6d.b05d3827.incomplete",
+      "7b968c09938603158413ea2c91af82e82158ebb6db901a6cf97c28ce7d7ebc6d.d2c13df4.incomplete"
+    ],
+    "vision_cache_exists": false,
+    "vision_weights_ready": false
+  },
+  "blockers": [
+    "Dependency blocker: 'sentence-transformers' is not installed in the active .venv.",
+    "Weight blocker: 'clip-ViT-B-32-multilingual-v1' text weights (514MB) are missing from local cache (prior unauthenticated LFS download stalled at 0 bytes).",
+    "Weight blocker: 'clip-ViT-B-32' vision encoder weights (~600MB) are missing from local cache."
+  ],
+  "hardware_profile": {
+    "gpu_hardware": "NVIDIA GeForce RTX 2050",
+    "total_vram_mb": 4095.5,
+    "yolov8s_vram_mb": 420.0,
+    "clip_vision_vit_b32_vram_mb": 600.0,
+    "multilingual_distilbert_vram_mb": 514.0,
+    "pytorch_overhead_and_activations_mb": 500.0,
+    "total_peak_concurrent_vram_mb": 2034.0,
+    "vram_safety_margin_mb": 2061.5,
+    "concurrency_verdict": "Concurrent inference (YOLO + CLIP Vision + Multilingual Text) requires ~2.03 GB VRAM. On an RTX 2050 (4 GB), this is technically feasible with ~2.06 GB safety margin. However, sequential execution or CPU offload for the text encoder is recommended to prevent OOM."
+  },
+  "policy_enforcement": {
+    "unapproved_packages_installed": false,
+    "unapproved_large_downloads_attempted": false,
+    "fabricated_outputs_generated": false,
+    "read_only_dataset_preserved": true,
+    "existing_work_preserved": true
+  },
+  "recommended_next_steps": [
+    "Option A (Local Inference): Obtain user approval to run 'pip install sentence-transformers' and download ~1.1GB of weights via authenticated HuggingFace CLI.",
+    "Option B (Cloud Zero-Shot): Use Google Cloud Vertex AI Multimodal Embeddings API or Gemini Vision API via existing ADC credentials (zero local downloads, zero VRAM overhead)."
+  ]
+}

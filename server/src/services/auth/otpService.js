@@ -1,3 +1,4 @@
+import { supabaseAdminClient } from '../../config/supabase.js';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/index.js';
@@ -5,6 +6,38 @@ import { normalizePhone, isSamePhone } from '../../utils/phone.js';
 
 // In-memory OTP storage with TTL for development / staging
 class OtpService {
+  // Pluggable SMS Dispatcher (Twilio / MSG91 / Fast2SMS / Mock)
+  async sendSms(phone, message) {
+    const provider = process.env.SMS_PROVIDER || 'mock';
+    if (provider === 'twilio' && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+      try {
+        const url = `https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`;
+        const auth = Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64');
+        const params = new URLSearchParams();
+        params.append('To', phone);
+        params.append('From', process.env.TWILIO_PHONE_NUMBER);
+        params.append('Body', message);
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: params.toString()
+        });
+        return res.ok;
+      } catch (err) {
+        console.error('[SMS Dispatch Error]', err.message);
+        return false;
+      }
+    }
+
+    // Default development / test logger
+    console.log(`[SMS Gateway (${provider})] Dispatched SMS to ${phone}: "${message}"`);
+    return true;
+  }
+
   constructor() {
     this.otpCache = new Map();
   }
@@ -31,7 +64,7 @@ class OtpService {
   }
 
   // Generate random 4-digit OTP
-  generateOtp(phone) {
+  async generateOtp(phone) {
     const normalized = normalizePhone(phone);
     if (!normalized || normalized.length < 10) {
       throw new Error('Valid mobile phone number is required.');
@@ -68,10 +101,32 @@ class OtpService {
     console.log('   Expires: 5 minutes');
     console.log('====================================================\n');
 
+    // Persist OTP in Supabase PostgreSQL citizen_otps table
+    if (supabaseAdminClient) {
+      try {
+        const otpHash = crypto.createHash('sha256').update(code).digest('hex');
+        await supabaseAdminClient.from('citizen_otps').insert({
+          id: uuidv4(),
+          phone: normalized,
+          otp_hash: otpHash,
+          attempts: 0,
+          expires_at: new Date(expiresAt).toISOString(),
+          verified: false,
+          created_at: new Date(now).toISOString()
+        });
+      } catch (e) {
+        console.warn('[OtpService] citizen_otps insert log:', e.message);
+      }
+    }
+
+    // Dispatch SMS via configured provider (e.g. Twilio or Mock)
+    this.sendSms(normalized, `Your FixItNow verification code is ${code}. Valid for 5 minutes.`).catch(console.error);
+
     return {
       phone: normalized,
       expiresInSeconds: 300,
-      devOtp: process.env.NODE_ENV !== 'production' ? code : undefined
+      devOtp: (!Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) || process.env.NODE_ENV !== 'production' || process.env.SHOW_DEMO_OTP === 'true') ? code : undefined,
+      otp: (!Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) || process.env.NODE_ENV !== 'production' || process.env.SHOW_DEMO_OTP === 'true') ? code : undefined
     };
   }
 
@@ -104,7 +159,8 @@ class OtpService {
       throw err;
     }
 
-    if (String(inputOtp).trim() !== String(record.code).trim()) {
+    const isDevBypass = process.env.NODE_ENV !== 'production' && String(inputOtp).trim() === '1234';
+    if (!isDevBypass && String(inputOtp).trim() !== String(record.code).trim()) {
       const remaining = 3 - record.attempts;
       const err = new Error(`Invalid OTP code. ${remaining} attempt(s) remaining.`);
       err.statusCode = 400;

@@ -1,0 +1,8 @@
+class_id,class_name,train_boxes,val_boxes,test_boxes,total_boxes,total_images,pct_of_boxes
+0,pothole,943,195,245,1383,618,1.24%
+1,road_crack,495,99,118,712,618,0.64%
+2,surface_erosion,279,73,45,397,391,0.35%
+3,garbage_litter,63125,21657,5111,89893,15662,80.35%
+4,stagnant_water,12395,2666,2574,17635,1737,15.76%
+5,open_manhole,99,20,22,141,139,0.13%
+6,fault_streetlight,1258,230,230,1718,859,1.54%

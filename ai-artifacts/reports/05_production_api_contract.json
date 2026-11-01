@@ -1,0 +1,38 @@
+{
+  "status": "success",
+  "detections": [
+    {
+      "class_id": 1,
+      "class_name": "road_crack",
+      "category": "Roads & Potholes",
+      "priority": "MEDIUM",
+      "confidence": 0.4283,
+      "bbox": [
+        312.9,
+        114.9,
+        391.5,
+        389.6
+      ]
+    },
+    {
+      "class_id": 1,
+      "class_name": "road_crack",
+      "category": "Roads & Potholes",
+      "priority": "MEDIUM",
+      "confidence": 0.3932,
+      "bbox": [
+        265.3,
+        92.8,
+        398.8,
+        408.2
+      ]
+    }
+  ],
+  "count": 2,
+  "primary_category": "Roads & Potholes",
+  "recommended_priority": "MEDIUM",
+  "is_flagged": true,
+  "flag_reason": "Low confidence detection (43%). Photo requires manual confirmation.",
+  "inference_time_ms": 34.22,
+  "model_version": "improved_yolov8s"
+}

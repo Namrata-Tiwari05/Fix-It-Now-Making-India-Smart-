@@ -1,0 +1,22 @@
+{
+  "evaluation_reference": "Notebook 04 & YOLOv8 Improvement Fine-Tuning Run",
+  "class_performance_tier": {
+    "High Performance (Production Ready)": {
+      "fault_streetlight": "mAP50 99.5%, Recall 100%, Precision 99.7%. Distinct geometry.",
+      "pothole": "mAP50 61.4% (+10.9% in candidate). High municipal priority, robust asphalt contrast.",
+      "surface_erosion": "mAP50 61.1% (+7.6% in candidate). Strong texture representation."
+    },
+    "Moderate Performance (Operational)": {
+      "garbage_litter": "mAP50 59.4%, Precision 75.1%. Distinct multi-color clusters, slight confusion with ground clutter.",
+      "open_manhole": "mAP50 55.5%, Recall 75.0%. Crucial safety class; high recall ensures critical hazards are flagged."
+    },
+    "Challenging / Weak Classes (Known Limitations)": {
+      "road_crack": "mAP50 33.8%. Hairline cracks suffer from downsampling at 640x640. Mosaic augmentation was disabled to preserve continuity.",
+      "stagnant_water": "mAP50 17.6%. Highly ambiguous reflection patterns, muddy water blending into asphalt, seasonal glare."
+    }
+  },
+  "out_of_distribution_behavior": {
+    "finding": "Indoor, bedroom, desk, or selfie photos lack context; dark shadows can faintly trigger garbage_litter at conf < 0.40.",
+    "mitigation_implemented": "Activated two-tier threshold: detections with conf < 0.50 are flagged as UNVERIFIED, accompanied by manual citizen override button."
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "evaluation_timestamp": "2026-10-29 16:46:23",
+  "dataset": "C:\\FIN Dataset\\03_Master_Dataset",
+  "validation_images": 3671,
+  "validation_instances": 24940,
+  "baseline_checkpoint": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts\\training_runs\\baseline_yolov8s\\weights\\best.pt",
+  "improved_checkpoint": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts\\training_runs\\improved_yolov8s\\weights\\best.pt",
+  "overall_comparison": {
+    "mAP50": {
+      "baseline": 0.5142,
+      "improved": 0.555,
+      "delta_points": 4.08
+    },
+    "mAP50_95": {
+      "baseline": 0.3228,
+      "improved": 0.34,
+      "delta_points": 1.72
+    },
+    "precision": {
+      "baseline": 0.608,
+      "improved": 0.64,
+      "delta_points": 3.2
+    },
+    "recall": {
+      "baseline": 0.5023,
+      "improved": 0.54,
+      "delta_points": 3.77
+    }
+  },
+  "per_class_comparison": {
+    "pothole": {
+      "baseline_mAP50": 0.505,
+      "improved_mAP50": 0.614,
+      "delta_mAP50_points": 10.9,
+      "baseline_recall": 0.5026,
+      "improved_recall": 0.513,
+      "delta_recall_points": 1.04
+    },
+    "road_crack": {
+      "baseline_mAP50": 0.2433,
+      "improved_mAP50": 0.338,
+      "delta_mAP50_points": 9.47,
+      "baseline_recall": 0.2828,
+      "improved_recall": 0.404,
+      "delta_recall_points": 12.12
+    },
+    "surface_erosion": {
+      "baseline_mAP50": 0.5347,
+      "improved_mAP50": 0.611,
+      "delta_mAP50_points": 7.63,
+      "baseline_recall": 0.6438,
+      "improved_recall": 0.63,
+      "delta_recall_points": -1.38
+    },
+    "garbage_litter": {
+      "baseline_mAP50": 0.5661,
+      "improved_mAP50": 0.594,
+      "delta_mAP50_points": 2.79,
+      "baseline_recall": 0.4979,
+      "improved_recall": 0.456,
+      "delta_recall_points": -4.19
+    },
+    "stagnant_water": {
+      "baseline_mAP50": 0.144,
+      "improved_mAP50": 0.176,
+      "delta_mAP50_points": 3.2,
+      "baseline_recall": 0.039,
+      "improved_recall": 0.0253,
+      "delta_recall_points": -1.37
+    },
+    "open_manhole": {
+      "baseline_mAP50": 0.6115,
+      "improved_mAP50": 0.555,
+      "delta_mAP50_points": -5.65,
+      "baseline_recall": 0.55,
+      "improved_recall": 0.75,
+      "delta_recall_points": 20.0
+    },
+    "fault_streetlight": {
+      "baseline_mAP50": 0.995,
+      "improved_mAP50": 0.995,
+      "delta_mAP50_points": 0.0,
+      "baseline_recall": 1.0,
+      "improved_recall": 1.0,
+      "delta_recall_points": 0.0
+    }
+  }
+}

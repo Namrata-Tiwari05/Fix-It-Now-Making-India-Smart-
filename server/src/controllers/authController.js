@@ -17,7 +17,7 @@ export const authController = {
         return errorResponse(res, 'Mobile phone number is required.', 'MISSING_PHONE', 400);
       }
 
-      const result = otpService.generateOtp(phone);
+      const result = await otpService.generateOtp(phone);
       return successResponse(res, result, 'OTP sent successfully. Valid for 5 minutes.');
     } catch (err) {
       next(err);

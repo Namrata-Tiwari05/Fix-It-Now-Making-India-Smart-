@@ -1,0 +1,41 @@
+{
+  "audit_status": "PASSED",
+  "project_root": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart",
+  "dataset_root": "C:\\FIN Dataset\\03_Master_Dataset",
+  "artifacts_root": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\ai-artifacts",
+  "notebooks_root": "C:\\Fix It Now - Making India Smart\\Fix-It-Now-Making-India-Smart\\notebooks",
+  "hardware": {
+    "device": "NVIDIA GeForce RTX 2050",
+    "cuda_available": true
+  },
+  "totals": {
+    "images": 20132,
+    "labels": 20132,
+    "background_images": 212,
+    "corrupted_images": 0,
+    "cross_split_leakage_pairs": 0
+  },
+  "splits": {
+    "train": {
+      "images": 14263,
+      "labels": 14263,
+      "percentage": "70.85%"
+    },
+    "val": {
+      "images": 3671,
+      "labels": 3671,
+      "percentage": "18.23%"
+    },
+    "test": {
+      "images": 2198,
+      "labels": 2198,
+      "percentage": "10.92%"
+    }
+  },
+  "formats": {
+    "JPEG": 20109,
+    "WEBP": 20,
+    "MPO": 1,
+    "PNG": 2
+  }
+}

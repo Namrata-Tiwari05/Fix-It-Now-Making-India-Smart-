@@ -7,8 +7,9 @@ import { StatusBadge } from '../components/StatusBadge.jsx';
 import { PriorityBadge } from '../components/PriorityBadge.jsx';
 
 export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplaint, onOpenDrawer }) => {
-  const activeComplaints = complaints.filter(c => !['RESOLVED', 'CLOSED', 'REJECTED'].includes(c.status));
-  const resolvedComplaints = complaints.filter(c => ['RESOLVED', 'CLOSED'].includes(c.status));
+  const isMergedActive = (c) => Boolean(c.duplicate_of || c.is_merged_duplicate) && (!c.master_summary || !['RESOLVED', 'CLOSED'].includes(c.master_summary.status));
+  const activeComplaints = complaints.filter(c => (!['RESOLVED', 'CLOSED', 'REJECTED'].includes(c.status)) || isMergedActive(c));
+  const resolvedComplaints = complaints.filter(c => (['RESOLVED'].includes(c.status)) || (c.status === 'CLOSED' && !isMergedActive(c)));
 
   // Determine personalized citizen name and saved jurisdiction
   const citizenName = user?.name && user.name !== 'Unregistered Citizen' ? user.name : 'Citizen';
@@ -95,7 +96,7 @@ export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplain
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{locationBadgeText}</span>
           </div>
 
-          {/* Right-Side Slide-Out Drawer Menu Button (Replaces top bell) */}
+          {/* Right-Side Slide-Out Drawer Menu Button */}
           <button
             type="button"
             onClick={onOpenDrawer}
@@ -119,20 +120,20 @@ export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplain
         </div>
       </div>
 
-      {/* Hero Report Card */}
+      {/* Hero Report Card - Adaptive Clean Light & Dark Theme */}
       <div
-        className="glass-panel"
         style={{
           borderRadius: '24px',
           padding: '1.5rem',
           marginBottom: '1.5rem',
           position: 'relative',
           overflow: 'hidden',
-          border: '1px solid rgba(212, 255, 0, 0.25)',
-          background: 'linear-gradient(135deg, rgba(24, 32, 42, 0.9) 0%, rgba(18, 24, 31, 0.95) 100%)'
+          border: '1px solid var(--hero-border, rgba(212, 255, 0, 0.25))',
+          background: 'var(--hero-bg, linear-gradient(135deg, rgba(24, 32, 42, 0.95) 0%, rgba(18, 24, 31, 0.98) 100%))',
+          boxShadow: 'var(--hero-shadow, 0 10px 30px -10px rgba(0, 0, 0, 0.5))'
         }}
       >
-        {/* Subtle Lime Ambient Glow in background */}
+        {/* Ambient Glow */}
         <div
           style={{
             position: 'absolute',
@@ -141,32 +142,32 @@ export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplain
             width: '150px',
             height: '150px',
             borderRadius: '50%',
-            backgroundColor: 'rgba(212, 255, 0, 0.12)',
+            backgroundColor: 'var(--hero-glow, rgba(212, 255, 0, 0.12))',
             filter: 'blur(45px)',
             pointerEvents: 'none'
           }}
         />
 
         <div style={{ position: 'relative', zIndex: 2 }}>
-          {/* Replaced 'Intelligent Civic Dispatch' tag with personalized 'Welcome, {Citizen Name}' */}
+          {/* Personalized 'Welcome, {Citizen Name}' */}
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              backgroundColor: 'rgba(212, 255, 0, 0.12)',
-              border: '1px solid rgba(212, 255, 0, 0.25)',
+              backgroundColor: 'var(--hero-tag-bg, rgba(212, 255, 0, 0.12))',
+              border: '1px solid var(--hero-tag-border, rgba(212, 255, 0, 0.25))',
               padding: '0.28rem 0.75rem',
               borderRadius: '9999px',
               marginBottom: '0.75rem'
             }}
           >
-            <Sparkles size={13} color="#D4FF00" />
+            <Sparkles size={13} color="var(--hero-tag-text, #D4FF00)" />
             <span
               style={{
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                color: '#D4FF00',
+                color: 'var(--hero-tag-text, #D4FF00)',
                 letterSpacing: '0.02em'
               }}
             >
@@ -174,11 +175,11 @@ export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplain
             </span>
           </div>
 
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#F8FAFC', lineHeight: 1.25 }}>
+          <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--hero-title-color, #F8FAFC)', lineHeight: 1.25, margin: 0 }}>
             Report a problem.<br />Track progress. Get it fixed.
           </h2>
 
-          <p style={{ fontSize: '0.82rem', color: '#94A3B8', marginTop: '0.5rem', lineHeight: 1.4 }}>
+          <p style={{ fontSize: '0.83rem', color: 'var(--hero-desc-color, #94A3B8)', marginTop: '0.55rem', lineHeight: 1.45, marginBottom: 0 }}>
             Describe what you noticed with Problem Location PIN. AI triages and routes immediately to your Municipal Corporation.
           </p>
 
@@ -186,12 +187,22 @@ export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplain
             <button
               type="button"
               onClick={onOpenReport}
-              className="btn-lime glow-pulse"
               style={{
+                background: 'var(--hero-btn-bg, #D4FF00)',
+                color: 'var(--hero-btn-text, #0B0F12)',
+                boxShadow: 'var(--hero-btn-shadow, 0 8px 24px rgba(212, 255, 0, 0.35))',
+                border: 'none',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
                 padding: '0.85rem 1.4rem',
                 borderRadius: '14px',
                 fontSize: '0.92rem',
-                width: '100%'
+                width: '100%',
+                transition: 'all 0.2s ease'
               }}
             >
               <Plus size={19} strokeWidth={2.8} />
@@ -321,7 +332,7 @@ export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplain
                     <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-lime, #D4FF00)', letterSpacing: '0.04em' }}>
                       {c.complaint_number}
                     </span>
-                    <StatusBadge status={c.status} />
+                    <StatusBadge status={(c.is_merged_duplicate || c.duplicate_of) ? 'MERGED_DUPLICATE' : c.status} />
                   </div>
 
                   <h4
@@ -337,6 +348,12 @@ export const HomeView = ({ user, complaints = [], onOpenReport, onSelectComplain
                   >
                     {c.description}
                   </h4>
+
+                  {(c.is_merged_duplicate || c.duplicate_of) && (
+                    <div style={{ fontSize: '0.7rem', color: '#F59E0B', marginTop: '0.2rem', fontWeight: 600 }}>
+                      🔗 Consolidated with Master #{c.master_summary?.complaint_number || 'Parent'} ({c.master_summary?.status || 'In Progress'})
+                    </div>
+                  )}
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', fontSize: '0.72rem', color: 'var(--text-muted, #64748B)' }}>
                     <span>PIN: {c.pincode}</span>

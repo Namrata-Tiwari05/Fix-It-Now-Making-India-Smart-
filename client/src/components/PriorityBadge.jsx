@@ -7,7 +7,7 @@ const PRIORITY_CONFIG = {
   LOW: { label: 'Low', bg: 'rgba(148, 163, 184, 0.2)', text: '#94A3B8', border: 'rgba(148, 163, 184, 0.3)' }
 };
 
-export const PriorityBadge = ({ priority }) => {
+export const PriorityBadge = ({ priority, riskScore }) => {
   const conf = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.MEDIUM;
 
   return (
@@ -16,17 +16,31 @@ export const PriorityBadge = ({ priority }) => {
         backgroundColor: conf.bg,
         color: conf.text,
         border: `1px solid ${conf.border}`,
-        padding: '0.15rem 0.5rem',
+        padding: '0.18rem 0.55rem',
         fontSize: '0.7rem',
-        fontWeight: 700,
+        fontWeight: 800,
         borderRadius: '6px',
         textTransform: 'uppercase',
         letterSpacing: '0.04em',
         display: 'inline-flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        gap: '0.35rem'
       }}
     >
-      {conf.label}
+      <span>{conf.label}</span>
+      {riskScore !== undefined && riskScore !== null && (
+        <span
+          style={{
+            fontSize: '0.62rem',
+            opacity: 0.85,
+            fontWeight: 700,
+            borderLeft: `1px solid ${conf.text}55`,
+            paddingLeft: '0.35rem'
+          }}
+        >
+          {riskScore} pts
+        </span>
+      )}
     </span>
   );
 };
