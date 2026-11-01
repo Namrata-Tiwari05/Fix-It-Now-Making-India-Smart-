@@ -139,6 +139,22 @@ app.get('/', (req, res) => {
   });
 });
 
+// API Root endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'FixItNow Civic Backend API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      complaints: '/api/complaints',
+      auth: '/api/auth',
+      municipal: '/api/municipal',
+      officer: '/api/officer'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
