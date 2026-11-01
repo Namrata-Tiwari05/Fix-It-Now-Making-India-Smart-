@@ -1,3 +1,6 @@
+import gc
+import torch
+torch.set_num_threads(1)
 """
 FixItNow AI Subsystem — Module A: YOLOv8 Civic Defect Detection
 """
@@ -89,6 +92,8 @@ def get_yolo_model():
 def get_coco_filter():
     """Singleton getter for the standard COCO Out-of-Distribution filter."""
     global _coco_model
+    if os.getenv("ENABLE_COCO_FILTER", "false").lower() != "true":
+        return None
     if _coco_model is not None:
         return _coco_model
     try:
@@ -131,6 +136,9 @@ def run_yolo_detection(image: Image.Image, conf_threshold: float = 0.14) -> Dict
         }
 
     start_t = time.perf_counter()
+    # Cloud Memory Guard: Cap dimensions to 640px to prevent NumPy memory explosion
+    if max(image.size) > 640:
+        image.thumbnail((640, 640), Image.Resampling.LANCZOS)
     img_w, img_h = image.size
     total_area = float(max(1, img_w * img_h))
 
@@ -231,7 +239,9 @@ def run_yolo_detection(image: Image.Image, conf_threshold: float = 0.14) -> Dict
         }
 
     try:
-        results = model.predict(source=image, imgsz=640, conf=conf_threshold, verbose=False)
+        with torch.no_grad():
+            results = model.predict(source=image, imgsz=640, conf=conf_threshold, verbose=False)
+        gc.collect()
         
         # Check if 640px produced an anomalous full-frame anchor (>75% coverage)
         has_full_frame_anchor = False

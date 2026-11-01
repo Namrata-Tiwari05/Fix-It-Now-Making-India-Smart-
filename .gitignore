@@ -69,3 +69,6 @@ pnpm-debug.log*
 
 # Temporary test scripts and scratch files
 scratch/
+
+cloudflared.exe
+
