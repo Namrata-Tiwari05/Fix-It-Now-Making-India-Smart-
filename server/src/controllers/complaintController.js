@@ -169,8 +169,26 @@ export const complaintController = {
       // Server-side authoritative PIN lookup (never trust client municipality)
       const routing = pincodeRoutingService.resolveMunicipality(pincode);
 
-      // AI Analysis
-      const aiResult = await aiOrchestrator.analyzeComplaint({ description, pincode, lat, lng, media });
+      // AI Analysis (reuse validation if already completed by FastAPI ML to prevent duplicate inference)
+      let aiResult;
+      if (validation && validation.source === 'fastapi_ml_validator') {
+        aiResult = {
+          category: validation.category,
+          primary_category: validation.category,
+          confidence: validation.categoryConfidence,
+          priority: validation.priority,
+          risk_score: validation.riskScore,
+          priority_confidence: validation.priorityConfidence,
+          priority_reason: validation.priorityReason,
+          safety_override_triggered: validation.safetyOverrideTriggered,
+          model_identifier: validation.modelIdentifier,
+          detections: validation.detections,
+          annotated_image: validation.annotatedImage,
+          validation_status: validation.validationStatus
+        };
+      } else {
+        aiResult = await aiOrchestrator.analyzeComplaint({ description, pincode, lat, lng, media });
+      }
 
       // Module 3: Priority is generated authoritatively by the backend. Citizen cannot change priority!
       const finalCategory = category || aiResult.category || 'Roads & Potholes';
